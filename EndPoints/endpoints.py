@@ -1,7 +1,6 @@
 from flask import request, jsonify
 from handlers.password_handler import *
 from flask_jwt_extended import create_access_token
-from datetime import timedelta
 from handlers.email_handler import *
 import os
 from handlers.query_handler import *

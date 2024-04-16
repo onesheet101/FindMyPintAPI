@@ -1,13 +1,10 @@
 import bcrypt
-from query_handler import *
-
+from handlers.query_handler import *
 
 def authenticate_user(username, password, db):
-    userTable = "userpassword"
-    itemToFind = "hashed_password"
 
     #check and see if username exists in database need to set up interface!!!
-    if does_user_exist(username, userTable, db) is False:
+    if does_user_exist(username, "userpassword", db) is False:
         return False
 
     #hashed_password will need to be retrieved from database where given username matches the username in table.
