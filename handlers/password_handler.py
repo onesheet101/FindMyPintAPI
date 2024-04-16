@@ -49,7 +49,7 @@ def get_record_item(username, item, table, db):
 
 def store_password(username, hashed_password, db):
     with db.cursor() as cursor:
-        query = "INSERT INTO users (username, hashed_password) VALUES (%s, %s)"
+        query = "INSERT INTO userpassword (username, hashed_password) VALUES (%s, %s)"
 
         cursor.execute(query, (username, hashed_password))
 
@@ -59,7 +59,7 @@ def store_password(username, hashed_password, db):
 
 def update_password(username, hashed_password, db):
     with db.cursor() as cursor:
-        query = "UPDATE users SET hashed_password = %s WHERE username = %s"
+        query = "UPDATE userpassword SET hashed_password = %s WHERE username = %s"
 
         cursor.execute(query, (hashed_password, username))
 
