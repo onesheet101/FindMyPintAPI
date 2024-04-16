@@ -2,7 +2,7 @@ import bcrypt
 
 
 def authenticate_user(username, password, db):
-    userTable = "users"
+    userTable = "userpassword"
     itemToFind = "hashed_password"
 
     #check and see if username exists in database need to set up interface!!!

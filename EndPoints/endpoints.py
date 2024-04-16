@@ -49,37 +49,34 @@ def setup_endpoints(app, jwt, db, context, config):
 
     @app.route('/register', methods=['POST'])
     def register():
-        print('1', file=sys.stderr)
         user_table = "userpassword"
         data = request.get_json()
 
         username = data.get('username')
         password = data.get('password')
         email = data.get('email')
-        print('2', file=sys.stderr)
+
         # Checks if any fields are empty again.
         if not username or not password or not email:
             return jsonify({"error": "Missing a parameter"}), 400
-        print('3', file=sys.stderr)
+
 
         # check and see if username exists in database need to set up interface!!!
         # If user exists return error code and message.
         if does_user_exist(username, user_table, db):
             return jsonify({"error": "User already exists"}), 409
-        print('4', file=sys.stderr)
 
         if not check_user_pass_validity(password):
             return jsonify({"error": "Password format incorrect"}), 400
-        print('5', file=sys.stderr)
+
         if not check_user_pass_validity(username):
             return jsonify({"error": "Username format incorrect"}), 400
-        print('6', file=sys.stderr)
+
 
         email_password = os.getenv('SECRET_EMAIL_KEY')
         if not send_confirmation(email, context, config, email_password):
             return jsonify({"error": "Email could not be sent, registration failed"}), 400
 
-        print('7', file=sys.stderr)
         hashed_password = hash_password(password)
 
         # store hashed_password with the username in the database again need to work on implementing database functionality.
