@@ -5,7 +5,6 @@ from sklearn.cluster import KMeans as km
 import googlemaps as gmaps
 import warnings
 
-
 class GoogleMapsAPI:
     fields = ['dine_in', 'price_level', 'serves_beer', 'serves_breakfast', 'serves_dinner', 'serves_lunch',
               'serves_wine', 'serves_vegetarian_food',
