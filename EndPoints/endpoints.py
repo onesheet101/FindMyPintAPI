@@ -1,6 +1,6 @@
 from flask import request, jsonify
-from flask_jwt_extended import create_access_token
 from handlers.email_handler import *
+from flask_jwt_extended import jwt_required, create_access_token, get_jwt_identity
 import os
 
 
@@ -85,12 +85,27 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth):
 
 
 #-----------------------Post Handling----------------------------------------------------------------------
-    @app.route('/post/save', methods=['POST'])
-    def save_post():
+    @app.route('/upload_post', methods=['POST'])
+    @jwt_required()
+    def upload_post():
+        user_id = get_jwt_identity()
         data = request.get_json()
-        user_id = data.get('user_id')
         body = data.get('body')
         return posth.upload_post(user_id, body)
+
+    @app.route('/delete_post', methods=['POST'])
+    @jwt_required()
+    def delete_post():
+        user_id = get_jwt_identity()
+        data = request.get_json()
+        post_id = data.get('post_id')
+        if not posth.does_post_exist(post_id):
+            return jsonify({'error': 'Post does not exist for given post Id.'}), 404
+        if posth.is_post_owner:
+            posth.deletePost(post_id)
+            return jsonify({'message': 'Post deleted'}), 200
+        else:
+            return jsonify({'error': 'User does not own that post'}), 403
 
 
 
