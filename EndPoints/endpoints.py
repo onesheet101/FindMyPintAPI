@@ -108,7 +108,7 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh,
 
     # -----------------------------------Generate Posts Handling--------------------------------------------
 
-    @app.route('/generate-recommended-posts', method=['GET'])
+    @app.route('/generate-recommended-posts', methods=['GET'])
     @jwt_required()
     def generateForYouPosts():
 
@@ -116,23 +116,29 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh,
         fy_posts = posth.getRecommendedPosts(user_id)
         loaded_posts = generateh.load_posts(fy_posts)
 
-        return jsonify({'username': loaded_posts[0], 'text': loaded_posts[1], 'time': loaded_posts[2]})
+        out = {'username': loaded_posts[0], 'text': loaded_posts[1], 'time': loaded_posts[2]}
 
-    @app.route('/generate-all-posts', method=['GET'])
+        return jsonify({'data': out})
+
+    @app.route('/generate-all-posts', methods=['GET'])
     def generateAllPosts():
 
         all_posts = posth.getAllPosts()
         loaded_posts = generateh.load_posts(all_posts)
 
-        return jsonify({'username': loaded_posts[0]}, {'text': loaded_posts[1]}, {'time': loaded_posts[2]})
+        out = {'username': loaded_posts[0]}, {'text': loaded_posts[1]}, {'time': loaded_posts[2]}
 
-    @app.route('/generate-friends-posts', method=['GET'])
+        return jsonify({'data': out})
+
+    @app.route('/generate-friends-posts', methods=['GET'])
     def generateFriendsPosts():
 
         friends_posts = posth.getFriendsPosts()
         loaded_posts = generateh.load_posts(friends_posts)
 
-        return jsonify({'username': loaded_posts[0]}, {'text': loaded_posts[1]}, {'time': loaded_posts[2]})
+        out = {'username': loaded_posts[0]}, {'text': loaded_posts[1]}, {'time': loaded_posts[2]}
+
+        return jsonify({'data': out})
 
 #----------------------------Route----------------------------------------------
 
@@ -166,7 +172,10 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh,
             distance = request.args.get('Distance')
             routeh.createRoute(start_point, 7, distance)
             locations = routeh.getFinalRoute()
-            return jsonify({'MapLocations': str(locations)})
+
+            out = {'MapLocations': str(locations)}
+
+            return jsonify({'data': out})
         except Exception as e:
 
             return jsonify({'message': 'Unable to create route'})

@@ -325,6 +325,7 @@ class Route:
         estabs = kme.formDataset(gme.produceAttributes(sp))
         placeNames = gme.getPlaceNames()
         place_id = gme.getPlaceIDs()
+
         pred = kme.buildModel(estabs, classNo)
 
         iniPred = kme.predictClass(sp)
