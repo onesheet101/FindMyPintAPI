@@ -121,14 +121,25 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth):
 
 
 #-----------------------Account Handling----------------------------------------------------------------------
-    @app.route('/account/update_drinks', methods  = ['POST'])
-    @jwt_required()
-    def update_drinks():
-        pass 
-
-    @app.route('/account/update_establishments', methods = ['POST'])
+    @app.route('/account/update_establishments', methods  = ['POST'])
     @jwt_required()
     def update_establishments():
+        #Find what estbalishments needs updating 
+        data = request.get_json()
+        number  = data.get_json("number")
+        new_name  = data.get_json("drink_name")
+        est_name  = "est"+number
+        user_id = get_jwt_identity()
+        data = (est_name, new_name, user_id)
+        query = "UPDATE user_preferences SET %s = %s userid =%s" 
+        if queryh.run_query(query,data,False):
+            return jsonify({"message": "data successfully updated"}),200
+        else:
+            return jsonify({"error": "Database not updated"}),400 
+
+    @app.route('/account/update_drinks', methods = ['POST'])
+    @jwt_required()
+    def update_drinks():
         ##Find what drink needs updating 
         data = request.get_json()
         number  = data.get_json("number")
