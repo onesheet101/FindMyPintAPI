@@ -318,6 +318,8 @@ class Route:
     def createRoute(self, sp, classNo, no_of_estab):
 
         correctPlaces = []
+        correct_coords = []
+        correct_place_id = []
         kme = KMeans(self.gm)
         # gm = GoogleMapsAPI(sp, self.searchTerm)
         estabs = kme.formDataset(self.gm.produceAttributes())

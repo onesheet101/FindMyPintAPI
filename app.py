@@ -64,7 +64,7 @@ routeh = Route(gm, db)
 
 
 #This passes the flask and extension objects to the endpoint functions so they can use their library methods.
-setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh, kmeansh, routeh)
+setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh, kmeansh, routeh, generateh)
 
 if __name__ == '__main__':
     #Starts flask
