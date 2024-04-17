@@ -85,7 +85,7 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth):
 
 
 #-----------------------Post Handling----------------------------------------------------------------------
-    @app.route('/upload_post', methods=['POST'])
+    @app.route('/upload-post', methods=['POST'])
     @jwt_required()
     def upload_post():
         user_id = get_jwt_identity()
@@ -99,7 +99,7 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth):
             return jsonify({'error': 'The post body was empty'}), 400
         return posth.upload_post(user_id, body, latitude, longitude)
 
-    @app.route('/delete_post', methods=['POST'])
+    @app.route('/delete-post', methods=['POST'])
     @jwt_required()
     def delete_post():
         user_id = get_jwt_identity()
@@ -109,7 +109,7 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth):
             return jsonify({'error': 'Post does not exist for given post_id'}), 404
         if posth.is_post_owner:
             posth.deletePost(post_id)
-            return jsonify({'message': 'Post deleted'}), 200
+            return jsonify({'data': 'Post deleted'}), 200
         else:
             return jsonify({'error': 'User does not own that post'}), 403
 
