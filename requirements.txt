@@ -4,6 +4,5 @@ flask_jwt_extended
 bcrypt
 python-dotenv
 gunicorn
-sklearn
+scikit-learn
 googlemaps
-numpy
