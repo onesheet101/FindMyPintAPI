@@ -60,7 +60,7 @@ posth = PostHandler(db, gm)
 generateh = Generate(db)
 gmapsh = GoogleMapsAPI(gm)
 kmeansh = KMeans(gm)
-routeh = Route(gm)
+routeh = Route(gm, db)
 
 
 #This passes the flask and extension objects to the endpoint functions so they can use their library methods.
