@@ -4,7 +4,7 @@ from flask_jwt_extended import jwt_required, create_access_token, get_jwt_identi
 import os
 
 
-def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth):
+def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh, kmeansh, routeh, generateh):
 
     #-------------------------------------------------------------------------------------------------------------------
     # ----------------------------------------------PASSWORD HANDLING---------------------------------------------------
@@ -83,7 +83,6 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth):
         else:
             return jsonify({"error": "Problem adding database record"}), 400
 
-
 #-----------------------Post Handling----------------------------------------------------------------------
     @app.route('/upload_post', methods=['POST'])
     @jwt_required()
@@ -106,6 +105,83 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth):
             return jsonify({'message': 'Post deleted'}), 200
         else:
             return jsonify({'error': 'User does not own that post'}), 403
+
+    # -----------------------------------Generate Posts Handling--------------------------------------------
+
+    @app.route('/feed/generateForYouPosts', method=['GET'])
+    @jwt_required()
+    def generateForYouPosts():
+
+        user_id = get_jwt_identity()
+        fy_posts = posth.getRecommendedPosts(user_id)
+        loaded_posts = generateh.load_posts(fy_posts)
+
+        return jsonify({'username': loaded_posts[0], 'text': loaded_posts[1], 'time': loaded_posts[2]})
+
+    @app.route('/feed/generateAllPosts', method=['GET'])
+    def generateAllPosts():
+
+        all_posts = posth.getAllPosts()
+        loaded_posts = generateh.load_posts(all_posts)
+
+        return jsonify({'username': loaded_posts[0]}, {'text': loaded_posts[1]}, {'time': loaded_posts[2]})
+
+    @app.route('/feed/generateFriendsPosts', method=['GET'])
+    def generateFriendsPosts():
+
+        friends_posts = posth.getFriendsPosts()
+        loaded_posts = generateh.load_posts(friends_posts)
+
+        return jsonify({'username': loaded_posts[0]}, {'text': loaded_posts[1]}, {'time': loaded_posts[2]})
+
+#----------------------------Route----------------------------------------------
+
+    @app.route('/map/getRecommendedEstablishments', methods=['GET'])
+    def getRecommendedestablishments():
+        # takes input coordinates and then produces establishments with the same classification around it
+
+        try:
+            start_point = request.args.get('Start Point')
+            #re = Recommended.GoogleMapsAPI(startPoint, searchTerm)
+            attr = gmapsh.produceAttributes()
+            attr = kmeansh.formDataset(attr)
+            names = gmapsh.getPlaceNames()
+            pred = kmeansh.buildModel(attr, 7)
+            prediction = kmeansh.predictClass(start_point)
+
+            recommended_estabs = kmeansh.sortClass(prediction, pred, names)
+
+            return jsonify({'data': {'Recommended_establishments': str(recommended_estabs)}})
+        except Exception as e:
+            print(e)
+            return jsonify({'message': 'Unable to produce recommended establishments'})
+
+
+    @app.route('/map/getRouteLocations', methods=['GET'])
+    def getRouteLocations():
+        # produces x number of establishment names for the route planner
+
+        try:
+            start_point = request.args.get('Start Point')
+            distance = request.args.get('Distance')
+            routeh.createRoute(start_point, 7, distance)
+            locations = routeh.getFinalRoute()
+            return jsonify({'MapLocations': str(locations)})
+        except Exception as e:
+
+            return jsonify({'message': 'Unable to create route'})
+
+    @app.route('/saveRoute', methods=['POST'])
+    @jwt_required()
+    def saveRoute():
+        # Take a list of establishments, convert them to a comma seperated string then save to database
+
+        user_id = get_jwt_identity()
+        route = request.get_json()
+
+        if routeh.saveRoute(route, user_id):
+            return jsonify({'message': 'Route saved successfully'})
+        return jsonify({'message': 'Error: Unable to save route'})
 
 
 
