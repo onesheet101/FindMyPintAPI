@@ -79,7 +79,11 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth):
 
         # store hashed_password with the username in the database again need to work on implementing database functionality.
         if passwordh.store_password(username, hashed_password, hashed_email):
-            return jsonify({"message": "User registered successfully"}), 201
+            try:
+                set_up_preferences()
+                return jsonify({"message": "User registered successfully"}), 201
+            except:
+                return jsonify({'error':"Problem occured setting up user preferences"}), 400
         else:
             return jsonify({"error": "Problem adding database record"}), 400
 
@@ -91,7 +95,13 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth):
         user_id = get_jwt_identity()
         data = request.get_json()
         body = data.get('body')
-        return posth.upload_post(user_id, body)
+        longitude = data.get('longitude')
+        latitude = data.get('latitude')
+        if not latitude or not longitude:
+            return jsonify({'error': 'Either latitude or longitude was not supplied.'}), 400
+        if not body:
+            return jsonify({'error': 'The post body was empty'}), 400
+        return posth.upload_post(user_id, body, latitude, longitude)
 
     @app.route('/delete_post', methods=['POST'])
     @jwt_required()
@@ -110,3 +120,30 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth):
 
 
 
+#-----------------------Account Handling----------------------------------------------------------------------
+    @app.route('/account/update_drinks', methods  = ['POST'])
+    @jwt_required()
+    def update_drinks():
+        pass 
+
+    @app.route('/account/update_establishments', methods = ['POST'])
+    @jwt_required()
+    def update_establishments():
+        pass 
+
+    @app.route('/account/set_up_preferences', methods = ['POST'])
+    @jwt_required()
+    def set_up_preferences():
+        user_id = get_jwt_identity()
+
+
+
+    @app.route('account/get_establishments', methods = ['GET'])
+    @jwt_required()
+    def get_establishments():
+        pass 
+
+    @app.route('/account/get_drinks', methods = ['GET'])
+    @jwt_required()
+    def get_drinks():
+        pass
