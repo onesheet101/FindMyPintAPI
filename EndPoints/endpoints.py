@@ -196,3 +196,36 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth):
         query = "SELECT drink1, drink2, drink3 FROM user_preferences WHERE userid ==%s"
         estbalishmnent_list = queryh.run_query(query, user_id, True)
         return jsonify({'data': estbalishmnent_list}) 
+    
+
+
+#-----------------------Route Handling----------------------------------------------------------------------
+    @app.route('/get/community_route',methods= ['GET'])
+    @jwt_required()
+    def get_community_routes():
+        #Select all routs in saved routes db and return name and routeid
+        query = "SELECT ID, Name FROM SavedRoutes"
+        routes_list = queryh.run_query(query)
+        return jsonify(routes_list)
+
+        ##Returns 
+
+    @app.route('/get/route',methods = ['GET']) 
+    def get_route():
+        routeid = request.get_json("routeid")
+        query = "SELECT PubList WHERE RouteID =%s"
+        route_list = []
+        est_list = queryh.run_query(query,routeid,True)
+        for id in est_list:
+            query = "SELECT ID, Name, Lat, Lon WHEREID = %s"
+
+            est_info = queryh.run_query(query,id,True)
+            location_dict = {
+            'pub_id': est_info[0],
+            'pub_name': est_info[1],
+            'latitude': est_info[2],
+            'longitude': est_info[3]
+            }
+            route_list.append(location_dict)
+        
+        return jsonify(location_dict)
