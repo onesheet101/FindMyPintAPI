@@ -1,69 +1,74 @@
 import bcrypt
-from handlers.query_handler import *
 
-def authenticate_user(username, password, db):
+class passwordHandler:
 
-    #check and see if username exists in database need to set up interface!!!
-    if does_user_exist(username, "userpassword", db) is False:
-        return False
-
-    #hashed_password will need to be retrieved from database where given username matches the username in table.
-    hashed_password = get_record_item(username, "hashed_password", "username", "userpassword", db).encode('utf-8')
-
-    #This hashes the given password then compares hashed password that is stored.
-    if bcrypt.checkpw(password.encode('utf-8'), hashed_password):
-        return True
-    else:
-        return False
+    def __int__(self, db):
+        self.db = db
 
 
-def does_user_exist(username, table,  db):
-    with db.cursor() as cursor:
+    def authenticate_user(self, username, password, qh):
 
-        query = f'SELECT * FROM {table} WHERE username = %s'
+        #check and see if username exists in database need to set up interface!!!
+        if self.does_user_exist(username, "userpassword") is False:
+            return False
 
-        cursor.execute(query, (username,))
+        #hashed_password will need to be retrieved from database where given username matches the username in table.
+        hashed_password = qh.get_record_item(username, "hashed_password", "username", "userpassword").encode('utf-8')
 
-        record = cursor.fetchone()
-
-        if record:
+        #This hashes the given password then compares hashed password that is stored.
+        if bcrypt.checkpw(password.encode('utf-8'), hashed_password):
             return True
         else:
             return False
 
 
-def store_password(username, hashed_password, db):
-    with db.cursor() as cursor:
-        query = "INSERT INTO userpassword (username, hashed_password) VALUES (%s, %s)"
+    def does_user_exist(self, username, table):
+        with self.db.cursor() as cursor:
 
-        cursor.execute(query, (username, hashed_password))
+            query = f'SELECT * FROM {table} WHERE username = %s'
 
-        db.commit()
-    return
+            cursor.execute(query, (username,))
+
+            record = cursor.fetchone()
+
+            if record:
+                return True
+            else:
+                return False
 
 
-def update_password(username, hashed_password, db):
-    with db.cursor() as cursor:
-        query = "UPDATE userpassword SET hashed_password = %s WHERE username = %s"
+    def store_password(self, username, hashed_password):
+        with self.db.cursor() as cursor:
+            query = "INSERT INTO userpassword (username, hashed_password) VALUES (%s, %s)"
 
-        cursor.execute(query, (hashed_password, username))
+            cursor.execute(query, (username, hashed_password))
 
-        db.commit()
-    return
+            self.db.commit()
+        return
 
-def hash_password(password):
-    hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
-    return hashed_password
 
-def check_user_pass_validity(password):
-    if " " in password:
-        return False
-        passlength = len(password)
-        if passlength <= 7 or passlength > 16:
+    def update_password(self, username, hashed_password):
+        with self.db.cursor() as cursor:
+            query = "UPDATE userpassword SET hashed_password = %s WHERE username = %s"
+
+            cursor.execute(query, (hashed_password, username))
+
+            self.db.commit()
+        return
+
+    def hash_password(self, password):
+        hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+        return hashed_password
+
+    def check_user_pass_validity(self, password):
+        if " " in password:
             return False
-        if not password.isascii():
-            return False
-        return True
+            passlength = len(password)
+            if passlength <= 7 or passlength > 16:
+                return False
+            if not password.isascii():
+                return False
+            return True
 
 
 

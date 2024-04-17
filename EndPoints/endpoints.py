@@ -1,11 +1,10 @@
 from flask import request, jsonify
-from handlers.password_handler import *
 from flask_jwt_extended import create_access_token
 from handlers.email_handler import *
 import os
-from handlers.query_handler import *
 
-def setup_endpoints(app, jwt, db, context, config):
+
+def setup_endpoints(app, jwt, context, config, ph, qh):
 
     #-------------------------------------------------------------------------------------------------------------------
     # ----------------------------------------------PASSWORD HANDLING---------------------------------------------------
@@ -21,8 +20,8 @@ def setup_endpoints(app, jwt, db, context, config):
             return jsonify({"error": "Missing username or password"}), 400
 
         #If the user is authenticated create a token that lasts for thirty minutes and return it to them.
-        if authenticate_user(username, password, db):
-            user_id = get_record_item(username, "user_id", "username", "userpassword", db)
+        if ph.authenticate_user(username, password, qh):
+            user_id = qh.get_record_item(username, "user_id", "username", "userpassword")
             access_token = create_access_token(identity=user_id)
             return jsonify({'message': 'Login successful'}), 200, {'Authorization': access_token}
         else:
@@ -36,13 +35,13 @@ def setup_endpoints(app, jwt, db, context, config):
         password = data.get('password')
         new_password = data.get('new_password')
 
-        if not check_user_pass_validity(new_password):
+        if not ph.check_user_pass_validity(new_password):
             return jsonify({"error": "New password format incorrect"}), 400
 
-        if authenticate_user(username, password, db):
-            hashed_password = hash_password(new_password)
+        if ph.authenticate_user(username, password):
+            hashed_password = ph.hash_password(new_password)
 
-            update_password(username, hashed_password, db)
+            ph.update_password(username, hashed_password)
             return jsonify({'message': 'Password change successful'}), 200
 
         return jsonify({'error': 'Invalid username or password'}), 401
@@ -63,13 +62,13 @@ def setup_endpoints(app, jwt, db, context, config):
 
         # check and see if username exists in database need to set up interface!!!
         # If user exists return error code and message.
-        if does_user_exist(username, user_table, db):
+        if ph.does_user_exist(username, user_table):
             return jsonify({"error": "User already exists"}), 409
 
-        if not check_user_pass_validity(password):
+        if not ph.check_user_pass_validity(password):
             return jsonify({"error": "Password format incorrect"}), 400
 
-        if not check_user_pass_validity(username):
+        if not ph.check_user_pass_validity(username):
             return jsonify({"error": "Username format incorrect"}), 400
 
 
@@ -77,10 +76,10 @@ def setup_endpoints(app, jwt, db, context, config):
         if not send_confirmation(email, context, config, email_password):
             return jsonify({"error": "Email could not be sent, registration failed"}), 400
 
-        hashed_password = hash_password(password)
+        hashed_password = ph.hash_password(password)
 
         # store hashed_password with the username in the database again need to work on implementing database functionality.
-        store_password(username, hashed_password, db)
+        ph.store_password(username, hashed_password)
 
         return jsonify({"message": "User registered successfully"}), 201
 

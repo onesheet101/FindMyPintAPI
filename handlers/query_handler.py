@@ -1,13 +1,18 @@
+class queryHandler:
+
+    def __int__(self, db):
+        self.db = db
+
 #This function is a general purpose function to retrieve a single record of a single collumn.
-def get_record_item(record_item, target_column, condition_column, table, db):
-    with db.cursor() as cursor:
+    def get_record_item(self, record_item, target_column, condition_column, table):
+        with self.db.cursor() as cursor:
 
-        query = f'SELECT {target_column} FROM {table} WHERE {condition_column} = %s'
+            query = f'SELECT {target_column} FROM {table} WHERE {condition_column} = %s'
 
-        cursor.execute(query, (record_item,))
+            cursor.execute(query, (record_item,))
 
-        record = cursor.fetchone()
+            record = cursor.fetchone()
 
-        (give_item,) = record
+            (give_item,) = record
 
-        return give_item
+            return give_item
