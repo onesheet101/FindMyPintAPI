@@ -121,13 +121,13 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth):
 
 
 #-----------------------Account Handling----------------------------------------------------------------------
-    @app.route('/account/update_establishments', methods  = ['POST'])
+    @app.route('/update/establishments', methods  = ['POST'])
     @jwt_required()
     def update_establishments():
         #Find what estbalishments needs updating 
         data = request.get_json()
         number  = data.get_json("number")
-        new_name  = data.get_json("drink_name")
+        new_name  = data.get_json("est_name")
         est_name  = "est"+number
         user_id = get_jwt_identity()
         data = (est_name, new_name, user_id)
@@ -137,7 +137,7 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth):
         else:
             return jsonify({"error": "Database not updated"}),400 
 
-    @app.route('/account/update_drinks', methods = ['POST'])
+    @app.route('/update/drinks', methods = ['POST'])
     @jwt_required()
     def update_drinks():
         ##Find what drink needs updating 
@@ -154,7 +154,7 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth):
             return jsonify({"error": "Database not updated"}),400
 
 
-    @app.route('get/establishments', methods = ['GET'])
+    @app.route('/get/establishments', methods = ['GET'])
     @jwt_required()
     def get_establishments():
         user_id = get_jwt_identity()
@@ -162,7 +162,7 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth):
         estbalishmnent_list = queryh.run_query(query, user_id, True)
         return jsonify({'data': estbalishmnent_list})
 
-    @app.route('/account/get_drinks', methods = ['GET'])
+    @app.route('/get/drinks', methods = ['GET'])
     @jwt_required()
     def get_drinks():
         user_id = get_jwt_identity()
