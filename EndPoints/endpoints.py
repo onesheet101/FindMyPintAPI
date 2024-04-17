@@ -121,6 +121,33 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth):
 
 
 #-----------------------Account Handling----------------------------------------------------------------------
+    @app.route('/get/account', methods = ['GET'])
+    @jwt_required()
+    def get_account_details(): 
+        user_id = get_jwt_identity()
+
+        # Get username
+        username_query = "SELECT username FROM new_user_sensitive WHERE userid = %s"
+        username = queryh.run_query(username_query, user_id, True)
+
+        # Get establishments
+        est_list_query = "SELECT est1, est2, est3 FROM user_preferences WHERE userid = %s"
+        establishments = queryh.run_query(est_list_query, user_id, True)
+
+        # Get drinks
+        drink_list_query = "SELECT drink1, drink2, drink3 FROM user_preferences WHERE userid = %s"
+        drinks = queryh.run_query(drink_list_query, user_id, True)
+
+        # Construct dictionary
+        account_details = {
+            'username': username,
+            'establishments': establishments,
+            'drinks': drinks
+        }
+
+        # Return as JSON
+        return jsonify(account_details)
+    
     @app.route('/update/establishments', methods  = ['POST'])
     @jwt_required()
     def update_establishments():
