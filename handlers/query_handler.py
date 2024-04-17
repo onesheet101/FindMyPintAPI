@@ -29,3 +29,22 @@ class QueryHandler:
             except Exception as e:
                 return False
 
+    def run_query(self,query, data = None, fetch_results = False):#Data is a tuple, query is the string with placeholders 
+        with self.db.cursor() as cursor:
+            try:
+                cursor.execute(query, data)
+                if fetch_results:
+                    results = cursor.fetchall()  # Fetch all results if needed
+                    return results
+                else:
+                    return True  # Query executed successfully
+            except Exception as e:
+                print(f"Error executing query: {query}")
+                print(f"Error details: {str(e)}")
+                return None
+
+    def set_up_preferences(self,user_id):
+        ##Insert into userpref table null values 
+        query = "INSERT INTO new_user_preference (user_id, est1, est2, est3, drink1,drink2,drink3) VALUES (%s, %s, %s, %s,%s, %s, %s)"
+        return  self.run_query(query,(user_id, None, None, None,None,None,None), False)
+            
