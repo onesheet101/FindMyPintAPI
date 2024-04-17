@@ -1,5 +1,5 @@
 from flask import jsonify
-import route_handler
+from route_handler import GoogleMapsAPI, KMeans
 
 class PostHandler:
 
@@ -84,10 +84,10 @@ class PostHandler:
         postIDs = []
         pubAttr = []
         for i in allPublic:
-            gm = route_handler.GoogleMapsAPI(self.gm)
+            gm = GoogleMapsAPI(self.gm)
             pubAttr.append(gm.getSingleAttribute(allPublic[i]))
 
-        km = route_handler.KMeans(self.gm)
+        km = KMeans(self.gm)
         data = km.formDataset(pubAttr)
         pred = km.buildModel(data, self.classNo)  # Indexes match with the PostID list
 
@@ -116,8 +116,8 @@ class PostHandler:
 
     def classify(self, coords) -> dict:
         # Provides a classification for an establishment given its coordinates and the 20 around it
-        gm = route_handler.GoogleMapsAPI(self.gm)  # initialise googlemaps API
-        km = route_handler.KMeans(self.gm)  # initialise KMeans classification
+        gm = GoogleMapsAPI(self.gm)  # initialise googlemaps API
+        km = KMeans(self.gm)  # initialise KMeans classification
 
         data = gm.produceAttributes(coords)  # get attributes of establishment with given coordinates
         pID = gm.getPlaceIDs()  # get the placeIDs
