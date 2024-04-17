@@ -100,7 +100,7 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth):
         data = request.get_json()
         post_id = data.get('post_id')
         if not posth.does_post_exist(post_id):
-            return jsonify({'error': 'Post does not exist for given post Id.'}), 404
+            return jsonify({'error': 'Post does not exist for given post_id'}), 404
         if posth.is_post_owner:
             posth.deletePost(post_id)
             return jsonify({'message': 'Post deleted'}), 200
