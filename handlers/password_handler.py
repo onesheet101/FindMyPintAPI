@@ -1,19 +1,18 @@
 import bcrypt
 
-class passwordHandler:
+class PasswordHandler():
 
-    def __int__(self, db):
+    def __init__(self, db):
         self.db = db
 
-
-    def authenticate_user(self, username, password, qh):
+    def authenticate_user(self, username, password, queryh):
 
         #check and see if username exists in database need to set up interface!!!
         if self.does_user_exist(username, "userpassword") is False:
             return False
 
         #hashed_password will need to be retrieved from database where given username matches the username in table.
-        hashed_password = qh.get_record_item(username, "hashed_password", "username", "userpassword").encode('utf-8')
+        hashed_password = queryh.get_record_item(username, "hashed_password", "username", "userpassword").encode('utf-8')
 
         #This hashes the given password then compares hashed password that is stored.
         if bcrypt.checkpw(password.encode('utf-8'), hashed_password):
@@ -37,15 +36,8 @@ class passwordHandler:
                 return False
 
 
-    def store_password(self, username, hashed_password):
-        with self.db.cursor() as cursor:
-            query = "INSERT INTO userpassword (username, hashed_password) VALUES (%s, %s)"
-
-            cursor.execute(query, (username, hashed_password))
-
-            self.db.commit()
-        return
-
+    def store_password(self, username, hashed_password, hashed_email):
+        return self.queryh.add_new_sensitive_record(username, hashed_password, hashed_email)
 
     def update_password(self, username, hashed_password):
         with self.db.cursor() as cursor:
@@ -56,9 +48,9 @@ class passwordHandler:
             self.db.commit()
         return
 
-    def hash_password(self, password):
-        hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
-        return hashed_password
+    def hash_string(self, password):
+        hashed_string = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+        return hashed_string
 
     def check_user_pass_validity(self, password):
         if " " in password:

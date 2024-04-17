@@ -6,13 +6,16 @@ import mysql.connector
 from mysql.connector import Error
 import ssl
 from configparser import ConfigParser
-from handlers.password_handler import passwordHandler
-from handlers.query_handler import queryHandler
+from handlers.password_handler import PasswordHandler
+from handlers.query_handler import QueryHandler
+from handlers.post_handler import PostHandler
+from dotenv import load_dotenv
 
 #Make sure to change this before pushing!
 #load_dotenv('Hidden/.env')
 #Initialises the flask app library.
 app = Flask(__name__)
+load_dotenv()
 
 try:
 
@@ -46,11 +49,12 @@ app.config['JWT_SECRET_KEY'] = os.getenv("SECRET_FLASK_KEY") #Will import this f
 jwt = JWTManager(app)
 
 #Create Handler Instances
-ph = passwordHandler(db)
-qh = queryHandler(db)
+passwordh = PasswordHandler(db)
+queryh = QueryHandler(db)
+posth = PostHandler(db)
 
 #This passes the flask and extension objects to the endpoint functions so they can use their library methods.
-setup_endpoints(app, jwt, context, config, ph, qh)
+setup_endpoints(app, jwt, context, config, passwordh, queryh, posth)
 
 if __name__ == '__main__':
     #Starts flask

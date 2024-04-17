@@ -4,7 +4,7 @@ from handlers.email_handler import *
 import os
 
 
-def setup_endpoints(app, jwt, context, config, ph, qh):
+def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth):
 
     #-------------------------------------------------------------------------------------------------------------------
     # ----------------------------------------------PASSWORD HANDLING---------------------------------------------------
@@ -20,8 +20,8 @@ def setup_endpoints(app, jwt, context, config, ph, qh):
             return jsonify({"error": "Missing username or password"}), 400
 
         #If the user is authenticated create a token that lasts for thirty minutes and return it to them.
-        if ph.authenticate_user(username, password, qh):
-            user_id = qh.get_record_item(username, "user_id", "username", "userpassword")
+        if passwordh.authenticate_user(username, password, queryh):
+            user_id = queryh.get_record_item(username, "user_id", "username", "userpassword")
             access_token = create_access_token(identity=user_id)
             return jsonify({'message': 'Login successful'}), 200, {'Authorization': access_token}
         else:
@@ -35,13 +35,13 @@ def setup_endpoints(app, jwt, context, config, ph, qh):
         password = data.get('password')
         new_password = data.get('new_password')
 
-        if not ph.check_user_pass_validity(new_password):
+        if not passwordh.check_user_pass_validity(new_password):
             return jsonify({"error": "New password format incorrect"}), 400
 
-        if ph.authenticate_user(username, password):
-            hashed_password = ph.hash_password(new_password)
+        if passwordh.authenticate_user(username, password):
+            hashed_password = passwordh.hash_password(new_password)
 
-            ph.update_password(username, hashed_password)
+            passwordh.update_password(username, hashed_password)
             return jsonify({'message': 'Password change successful'}), 200
 
         return jsonify({'error': 'Invalid username or password'}), 401
@@ -59,29 +59,39 @@ def setup_endpoints(app, jwt, context, config, ph, qh):
         if not username or not password or not email:
             return jsonify({"error": "Missing a parameter"}), 400
 
+        if not passwordh.check_user_pass_validity(password):
+            return jsonify({"error": "Password format incorrect"}), 400
+
+        if not passwordh.check_user_pass_validity(username):
+            return jsonify({"error": "Username format incorrect"}), 400
 
         # check and see if username exists in database need to set up interface!!!
         # If user exists return error code and message.
-        if ph.does_user_exist(username, user_table):
+        if passwordh.does_user_exist(username, user_table):
             return jsonify({"error": "User already exists"}), 409
-
-        if not ph.check_user_pass_validity(password):
-            return jsonify({"error": "Password format incorrect"}), 400
-
-        if not ph.check_user_pass_validity(username):
-            return jsonify({"error": "Username format incorrect"}), 400
-
 
         email_password = os.getenv('SECRET_EMAIL_KEY')
         if not send_confirmation(email, context, config, email_password):
             return jsonify({"error": "Email could not be sent, registration failed"}), 400
 
-        hashed_password = ph.hash_password(password)
+        hashed_password = passwordh.hash_string(password)
+        hashed_email = passwordh.hash_string(email)
 
         # store hashed_password with the username in the database again need to work on implementing database functionality.
-        ph.store_password(username, hashed_password)
+        if passwordh.store_password(username, hashed_password, hashed_email):
+            return jsonify({"message": "User registered successfully"}), 201
+        else:
+            return jsonify({"error": "Problem adding database record"}), 400
 
-        return jsonify({"message": "User registered successfully"}), 201
+
+#-----------------------Post Handling----------------------------------------------------------------------
+    @app.route('/post/save', methods=['POST'])
+    def save_post():
+        data = request.get_json()
+        user_id = data.get('user_id')
+        body = data.get('body')
+        return posth.upload_post(user_id, body)
+
 
 
 

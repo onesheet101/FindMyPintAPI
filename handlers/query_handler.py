@@ -1,6 +1,6 @@
-class queryHandler:
+class QueryHandler:
 
-    def __int__(self, db):
+    def __init__(self, db):
         self.db = db
 
 #This function is a general purpose function to retrieve a single record of a single collumn.
@@ -16,3 +16,16 @@ class queryHandler:
             (give_item,) = record
 
             return give_item
+
+    def add_new_user_sensitive_record(self, username, password, email):
+        with self.db.cursor() as cursor:
+            try:
+                query = "INSERT INTO new_user_sensitive (username, password, email) VALUES (%s, %s, %s)"
+
+                cursor.execute(query, (username, password, email))
+
+                self.db.commit()
+                return True
+            except Exception as e:
+                return False
+
