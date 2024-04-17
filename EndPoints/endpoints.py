@@ -108,7 +108,7 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh,
 
     # -----------------------------------Generate Posts Handling--------------------------------------------
 
-    @app.route('/feed/generateForYouPosts', method=['GET'])
+    @app.route('/generate-recommended-posts', method=['GET'])
     @jwt_required()
     def generateForYouPosts():
 
@@ -118,7 +118,7 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh,
 
         return jsonify({'username': loaded_posts[0], 'text': loaded_posts[1], 'time': loaded_posts[2]})
 
-    @app.route('/feed/generateAllPosts', method=['GET'])
+    @app.route('/generate-all-posts', method=['GET'])
     def generateAllPosts():
 
         all_posts = posth.getAllPosts()
@@ -126,7 +126,7 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh,
 
         return jsonify({'username': loaded_posts[0]}, {'text': loaded_posts[1]}, {'time': loaded_posts[2]})
 
-    @app.route('/feed/generateFriendsPosts', method=['GET'])
+    @app.route('/generate-friends-posts', method=['GET'])
     def generateFriendsPosts():
 
         friends_posts = posth.getFriendsPosts()
@@ -136,7 +136,7 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh,
 
 #----------------------------Route----------------------------------------------
 
-    @app.route('/map/getRecommendedEstablishments', methods=['GET'])
+    @app.route('/get-recommended-establishments', methods=['GET'])
     def getRecommendedestablishments():
         # takes input coordinates and then produces establishments with the same classification around it
 
@@ -157,7 +157,7 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh,
             return jsonify({'message': 'Unable to produce recommended establishments'})
 
 
-    @app.route('/map/getRouteLocations', methods=['GET'])
+    @app.route('/get-route-locations', methods=['GET'])
     def getRouteLocations():
         # produces x number of establishment names for the route planner
 
@@ -171,7 +171,7 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh,
 
             return jsonify({'message': 'Unable to create route'})
 
-    @app.route('/saveRoute', methods=['POST'])
+    @app.route('/save-route', methods=['POST'])
     @jwt_required()
     def saveRoute():
         # Take a list of establishments, convert them to a comma seperated string then save to database

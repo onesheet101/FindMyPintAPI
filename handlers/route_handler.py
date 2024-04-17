@@ -321,9 +321,10 @@ class Route:
         correct_coords = []
         correct_place_id = []
         kme = KMeans(self.gm)
-        # gm = GoogleMapsAPI(sp, self.searchTerm)
-        estabs = kme.formDataset(self.gm.produceAttributes())
-        placeNames = self.gm.getPlaceNames()
+        gme = GoogleMapsAPI(self.gm)
+        estabs = kme.formDataset(gme.produceAttributes(sp))
+        placeNames = gme.getPlaceNames()
+        place_id = gme.getPlaceIDs()
         pred = kme.buildModel(estabs, classNo)
 
         iniPred = kme.predictClass(sp)
@@ -331,6 +332,7 @@ class Route:
         for i in range(len(pred) - 1):
             if iniPred == pred[i]:
                 correctPlaces.append(placeNames[i])
+                correct_coords.append(place_id[i])
 
         correctPlaces = self.removeDuplicates(correctPlaces)
 
