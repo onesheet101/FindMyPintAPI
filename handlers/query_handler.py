@@ -39,10 +39,9 @@ class QueryHandler:
                 else:
                     return True  # Query executed successfully
             except Exception as e:
-                print(f"Error executing query: {query}")
-                print(f"Error details: {str(e)}")
-                return None
-
+                return False 
+            
+            
     def set_up_preferences(self,user_id):
         ##Insert into userpref table null values 
         query = "INSERT INTO new_user_preference (user_id, est1, est2, est3, drink1,drink2,drink3) VALUES (%s, %s, %s, %s,%s, %s, %s)"

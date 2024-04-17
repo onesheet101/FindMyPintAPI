@@ -129,21 +129,32 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth):
     @app.route('/account/update_establishments', methods = ['POST'])
     @jwt_required()
     def update_establishments():
-        pass 
-
-    @app.route('/account/set_up_preferences', methods = ['POST'])
-    @jwt_required()
-    def set_up_preferences():
+        ##Find what drink needs updating 
+        data = request.get_json()
+        number  = data.get_json("number")
+        new_name  = data.get_json("drink_name")
+        drink_name  = "drink"+number
         user_id = get_jwt_identity()
+        data = (drink_name, new_name, user_id)
+        query = "UPDATE user_preferences SET %s = %s userid =%s" 
+        if queryh.run_query(query,data,False):
+            return jsonify({"message": "data successfully updated"}),200
+        else:
+            return jsonify({"error": "Database not updated"}),400
 
 
-
-    @app.route('account/get_establishments', methods = ['GET'])
+    @app.route('get/establishments', methods = ['GET'])
     @jwt_required()
     def get_establishments():
-        pass 
+        user_id = get_jwt_identity()
+        query = "SELECT est1, est2, est3 FROM user_preferences WHERE userid ==%s"
+        estbalishmnent_list = queryh.run_query(query, user_id, True)
+        return jsonify({'data': estbalishmnent_list})
 
     @app.route('/account/get_drinks', methods = ['GET'])
     @jwt_required()
     def get_drinks():
-        pass
+        user_id = get_jwt_identity()
+        query = "SELECT drink1, drink2, drink3 FROM user_preferences WHERE userid ==%s"
+        estbalishmnent_list = queryh.run_query(query, user_id, True)
+        return jsonify({'data': estbalishmnent_list}) 
