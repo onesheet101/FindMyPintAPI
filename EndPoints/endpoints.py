@@ -121,6 +121,7 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh,
         return jsonify({'data': out})
 
     @app.route('/generate-all-posts', methods=['GET'])
+    @jwt_required()
     def generateAllPosts():
 
         all_posts = posth.getAllPosts()
@@ -131,9 +132,11 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh,
         return jsonify({'data': out})
 
     @app.route('/generate-friends-posts', methods=['GET'])
+    @jwt_required()
     def generateFriendsPosts():
 
-        friends_posts = posth.getFriendsPosts()
+        user_id = get_jwt_identity()
+        friends_posts = posth.getFriendsPosts(user_id)
         loaded_posts = generateh.load_posts(friends_posts)
 
         out = {'username': loaded_posts[0]}, {'text': loaded_posts[1]}, {'time': loaded_posts[2]}
@@ -171,9 +174,11 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh,
             start_point = request.args.get('Start Point')
             distance = request.args.get('Distance')
             routeh.createRoute(start_point, 7, distance)
-            locations = routeh.getFinalRoute()
+            location_names = routeh.getFinalRoute()['place_name']
+            location_ids = routeh.getFinalRoute()['place_id']
+            location_coords = routeh.getFinalRoute()['place_coord']
 
-            out = {'MapLocations': str(locations)}
+            out = {'location_names': location_names, 'location_ids': location_ids, 'location_coords': location_coords}
 
             return jsonify({'data': out})
         except Exception as e:

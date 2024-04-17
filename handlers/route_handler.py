@@ -81,7 +81,7 @@ class GoogleMapsAPI:
 
         return (dataAttributes)
 
-    def getEstabs(self, coords, searchTerm):
+    def getEstabs(self, coords):
 
         # gm = gmaps.Client(self.api_key) # set up client with API key
 
@@ -89,7 +89,6 @@ class GoogleMapsAPI:
         placeIDs = []
 
         searchTerm = 'pubs'
-        coords = (67.837, -3.836)
 
         # searchTerm -> key term to search for places
         biasRadius = 100  # radius of closeness bias from long/lat of device
@@ -119,6 +118,18 @@ class GoogleMapsAPI:
         ou.append(crds)
 
         return ou
+
+    def get_coords(self, loc):
+
+        try:
+            geo = self.gm.geocode(loc)
+            place = geo[0]['geometry']['location']
+            lat = place['lat']
+            lon = place['lng']
+
+            return lon, lat
+        except Exception as e:
+            return False
 
     def correctFormat(self, data):
         # data is the list of dict for the establishment data
@@ -307,6 +318,8 @@ class Route:
     noOfEstab = 0
     searchTerm = 'pub'
     finalRoute = []
+    final_route_id = []
+    final_route_coords = []
     prevResult = []
 
     warnings.filterwarnings('ignore')
@@ -333,12 +346,15 @@ class Route:
         for i in range(len(pred) - 1):
             if iniPred == pred[i]:
                 correctPlaces.append(placeNames[i])
-                correct_coords.append(place_id[i])
+                correct_place_id.append(place_id[i])
+                correct_coords.append(gme.get_coords(placeNames[i]))
 
         correctPlaces = self.removeDuplicates(correctPlaces)
 
         if len(correctPlaces) >= no_of_estab:
             self.finalRoute = correctPlaces[:no_of_estab]
+            self.final_route_id = correct_place_id[:no_of_estab]
+            self.final_route_coords = correct_coords[:no_of_estab]
             return True  # need to only return number of estab amount
         else:
             self.createRoute(sp, (classNo - 1), no_of_estab)
@@ -353,7 +369,7 @@ class Route:
         return out
 
     def getFinalRoute(self):
-        return self.finalRoute
+        return {'place_name': self.finalRoute, 'place_id': self.final_route_id, 'place_coord': self.final_route_coords}
 
     def saveRoute(self, route, user_id):
 
@@ -371,5 +387,3 @@ class Route:
         except Exception as e:
             print(e)
             return False
-
-# TODO: Implement a distance check function which checks that the next appropriate establishment is not next door or too far away
