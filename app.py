@@ -53,6 +53,7 @@ passwordh = PasswordHandler(db)
 queryh = QueryHandler(db)
 posth = PostHandler(db)
 
+
 #This passes the flask and extension objects to the endpoint functions so they can use their library methods.
 setup_endpoints(app, jwt, context, config, passwordh, queryh, posth)
 

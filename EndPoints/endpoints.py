@@ -91,7 +91,13 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth):
         user_id = get_jwt_identity()
         data = request.get_json()
         body = data.get('body')
-        return posth.upload_post(user_id, body)
+        longitude = data.get('longitude')
+        latitude = data.get('latitude')
+        if not latitude or not longitude:
+            return jsonify({'error': 'Either latitude or longitude was not supplied.'}), 400
+        if not body:
+            return jsonify({'error': 'The post body was empty'}), 400
+        return posth.upload_post(user_id, body, latitude, longitude)
 
     @app.route('/delete_post', methods=['POST'])
     @jwt_required()
