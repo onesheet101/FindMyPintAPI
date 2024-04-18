@@ -328,6 +328,7 @@ class Route:
         self.gm = gm
         self.db = db
 
+    list_of_dict = []
     def createRoute(self, sp, classNo, no_of_estab):
 
         correctPlaces = []
@@ -345,9 +346,13 @@ class Route:
 
         for i in range(len(pred) - 1):
             if iniPred == pred[i]:
-                correctPlaces.append(placeNames[i])
-                correct_place_id.append(place_id[i])
-                correct_coords.append(gme.get_coords(placeNames[i]))
+
+                for i in range(len(placeNames)):
+                    self.list_of_dict.append({'correct_place': placeNames[i], 'place_id': correct_place_id[i], 'place_coords': correct_coords[i]})
+
+                #correctPlaces.append(placeNames[i])
+                #correct_place_id.append(place_id[i])
+                #correct_coords.append(gme.get_coords(placeNames[i]))
 
         correctPlaces = self.removeDuplicates(correctPlaces)
 
@@ -369,7 +374,8 @@ class Route:
         return out
 
     def getFinalRoute(self):
-        return {'place_name': self.finalRoute, 'place_id': self.final_route_id, 'place_coord': self.final_route_coords}
+
+        return self.list_of_dict
 
     def saveRoute(self, route, user_id):
 

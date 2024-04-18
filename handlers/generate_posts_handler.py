@@ -21,10 +21,7 @@ class Generate:
         text = self.getText(postID)
         estabID = self.getEstablishmentID(postID)
 
-        out = []
-        out.append(username)
-        out.append(text)
-        out.append(time)
+        out = {'post_id': postID, 'username': username, 'text': text, 'time': time}
         return out
 
     def getData(self, posts: list):
