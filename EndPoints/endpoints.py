@@ -91,7 +91,7 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth):
 
 
 #-----------------------Post Handling----------------------------------------------------------------------
-    @app.route('/upload_post', methods=['POST'])
+    @app.route('/upload-post', methods=['POST'])
     @jwt_required()
     def upload_post():
         user_id = get_jwt_identity()
@@ -105,7 +105,7 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth):
             return jsonify({'error': 'The post body was empty'}), 400
         return posth.upload_post(user_id, body, latitude, longitude)
 
-    @app.route('/delete_post', methods=['POST'])
+    @app.route('/delete-post', methods=['POST'])
     @jwt_required()
     def delete_post():
         user_id = get_jwt_identity()
@@ -123,7 +123,7 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth):
 
 
 #-----------------------Account Handling----------------------------------------------------------------------
-    @app.route('/get/account', methods = ['GET'])
+    @app.route('/get-account', methods = ['GET'])
     @jwt_required()
     def get_account_details(): 
         user_id = get_jwt_identity()
@@ -150,7 +150,7 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth):
         # Return as JSON
         return jsonify(account_details)
     
-    @app.route('/update/establishments', methods  = ['POST'])
+    @app.route('/update-establishments', methods  = ['POST'])
     @jwt_required()
     def update_establishments():
         #Find what estbalishments needs updating 
@@ -166,7 +166,7 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth):
         else:
             return jsonify({"error": "Database not updated"}),400 
 
-    @app.route('/update/drinks', methods = ['POST'])
+    @app.route('/update-drinks', methods = ['POST'])
     @jwt_required()
     def update_drinks():#test
         ##Find what drink needs updating 
@@ -183,7 +183,7 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth):
             return jsonify({"error": "Database not updated"}),400
 
 
-    @app.route('/get/establishments', methods = ['GET'])
+    @app.route('/get-establishments', methods = ['GET'])
     @jwt_required()
     def get_establishments():
         user_id = get_jwt_identity()
@@ -191,7 +191,7 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth):
         estbalishmnent_list = queryh.run_query(query, user_id, True)
         return jsonify({'data': estbalishmnent_list})
 
-    @app.route('/get/drinks', methods = ['GET'])
+    @app.route('/get-drinks', methods = ['GET'])
     @jwt_required()
     def get_drinks():
         user_id = get_jwt_identity()
@@ -202,7 +202,7 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth):
 
 
 #-----------------------Route Handling----------------------------------------------------------------------
-    @app.route('/get/community_route',methods= ['GET'])
+    @app.route('/get-community-route',methods= ['GET'])
     @jwt_required()
     def get_community_routes():
         #Select all routs in saved routes db and return name and routeid
@@ -210,15 +210,15 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth):
         routes_list = queryh.run_query(query)
         return jsonify(routes_list)
 
-    @app.route('/get/route',methods = ['GET'])
+    @app.route('/get-saved-route',methods = ['GET'])
     @jwt_required() 
     def get_route():
-        routeid = request.get_json("routeid")
-        query = "SELECT PubList FROM SavedRoutes WHERE RouteID =%s"
+        routeid = request.get_json("route_id")
+        query = "SELECT est_list FROM SavedRoutes WHERE RouteID =%s"
         route_list = []
         est_list = queryh.run_query(query,routeid,True)
         for id in est_list:
-            query = "SELECT ID, Name, Lat, Lon FROM Establishment WHERE est_id = %s"
+            query = "SELECT est_id, Name, Lat, Lon FROM Establishment WHERE est_id = %s"
 
             est_info = queryh.run_query(query,id,True)
             location_dict = {
@@ -232,13 +232,13 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth):
         return jsonify(location_dict)
 
 
-    @app.route('/get/reviews', methods = ['GET'])
+    @app.route('/get-reviews', methods = ['GET'])
     @jwt_required()
     def get_establishment_reviews():
         pubid = request.get_json("est_id")
         query = "SELECT user_id, stars FROM reviews WHERE "
 
-    @app.route('/save/review',methods =['POST'])
+    @app.route('/save-review',methods =['POST'])
     @jwt_required()
     def saveReview(self, userID, stars, public, text):
         user_id = get_jwt_identity()
