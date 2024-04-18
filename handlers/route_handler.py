@@ -378,8 +378,8 @@ class Route:
             self.final_route_coords = correct_coords[:no_of_estab]
             #Move selected place names, route ids and coords into list of dictionary format
             self.list_of_dict.append(
-                {'est_name': self.finalRoute[0], 'est_id': self.final_route_id[0], 'lat': self.final_route_coords[0][0],
-                 'lon': self.final_route_coords[0][1]})
+                {'est_name': self.finalRoute[0], 'est_id': self.final_route_id[0], 'lat': sp[0],
+                 'lon': sp[1]})
 
             for i in range(1, len(self.finalRoute)):
                 self.list_of_dict.append({'est_name': self.finalRoute[i], 'est_id': self.final_route_id[i], 'lat': self.final_route_coords[1], 'lon': self.final_route_coords[i][0]})
