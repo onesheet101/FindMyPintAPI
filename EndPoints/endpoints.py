@@ -133,7 +133,7 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth):
 
         # Get username
         username_query = "SELECT username FROM user_sensitive WHERE user_id = %s"
-        username = queryh.run_query(username_query, user_id, True)
+        username = queryh.run_query(username_query, user_id, True)[0]
 
         # Get establishments
         est_list_query = "SELECT est_1, est_2, est_3 FROM user_preferences WHERE user_id = %s"
@@ -251,5 +251,5 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth):
             queryh.run_query(query, (user_id, stars))
             return jsonify({'message': 'Review saved successfully'}), 200
         except Exception as e:
-            print(e)
+            #print(e)
             return jsonify({'error': 'Review not saved'}), 400

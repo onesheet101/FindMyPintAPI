@@ -35,7 +35,10 @@ class QueryHandler:
                 cursor.execute(query, data)
                 if fetch_results:
                     results = cursor.fetchall()  # Fetch all results if needed
-                    return results
+                    if len(results) == 1:
+                        return results[0]
+                    else:
+                        return results
                 else:
                     return True  # Query executed successfully
             except Exception as e:
