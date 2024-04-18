@@ -383,7 +383,10 @@ class Route:
                 self.list_of_dict.append({'est_name': self.finalRoute[i], 'est_id': self.final_route_id[i], 'lon': (self.final_route_coords[i])[0], 'lat': (self.final_route_coords)[1]})
             return True  # need to only return number of estab amount
         else:
-            self.createRoute(sp, (classNo - 2), no_of_estab)
+            if classNo >= 3:
+                self.createRoute(sp, (classNo - 2), no_of_estab)
+            else:
+                self.createRoute(sp, 2, no_of_estab)
 
     def removeDuplicates(self, data):
 
