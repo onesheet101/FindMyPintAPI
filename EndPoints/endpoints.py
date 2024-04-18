@@ -216,8 +216,7 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh,
     @jwt_required()
     def get_estab_details():
 
-        data = request.get_json()
-        coords = data.get('coordinates')
+        coords = (request.args.get('lat'), request.args.get('lon')) 
         details = gmapsh.get_establishment_details(coords)
 
         return jsonify({'data': details})
