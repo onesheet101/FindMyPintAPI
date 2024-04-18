@@ -240,3 +240,19 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh,
             return jsonify({"message": "data successfully updated"}), 200
         else:
             return jsonify({"error": "Database not updated"}), 400
+
+    @app.route('/update-drinks', methods=['POST'])
+    @jwt_required()
+    def update_drink():  # test
+        ##Find what drink needs updating
+        data = request.get_json()
+        number = data.get_json("number")
+        new_name = data.get_json("drink_name")
+        drink_name = "drink" + number
+        user_id = get_jwt_identity()
+        data = (drink_name, new_name, user_id)
+        query = "UPDATE user_preferences SET %s = %s WHERE user_id =%s"
+        if queryh.run_query(query, data, False):
+            return jsonify({"message": "data successfully updated"}), 200
+        else:
+            return jsonify({"error": "Database not updated"}), 400
