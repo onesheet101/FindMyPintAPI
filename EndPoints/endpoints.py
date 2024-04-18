@@ -80,7 +80,7 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh,
         # store hashed_password with the username in the database again need to work on implementing database functionality.
         if passwordh.store_password(username, hashed_password, hashed_email, queryh):
             user_id = queryh.get_user_id(username)
-            query = "INSERT INTO user_preference (user_id, est1, est2, est3, drink1, drink2, drink3) VALUES (%s, %s, %s, %s, %s, %s, %s)"
+            query = "INSERT INTO user_preference (user_id, est_1, est_2, est_3, drink_1, drink_2, drink_3) VALUES (%s, %s, %s, %s, %s, %s, %s)"
             data = (user_id, "N/A", "N/A", "N/A", "Corona", "Corona", "Corona")
             queryh.run_query(query, data, False)
             return jsonify({"message": "User registered successfully"}), 201
