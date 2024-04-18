@@ -160,7 +160,7 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh,
             return jsonify({'message': 'Unable to produce recommended establishments'})
 
 
-    @app.route('/get-route-locations', methods=['GET'])
+    @app.route('/get-route', methods=['GET'])
     def getRouteLocations():
         # produces x number of establishment names for the route planner
         try:
