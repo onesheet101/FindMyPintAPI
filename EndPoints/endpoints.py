@@ -116,7 +116,9 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh,
         fy_posts = posth.getRecommendedPosts(user_id)
         loaded_posts = generateh.load_posts(fy_posts)
 
-        return jsonify({'data': loaded_posts})
+        out = {'username': loaded_posts[0], 'text': loaded_posts[1], 'time': loaded_posts[2]}
+
+        return jsonify({'data': out})
 
     @app.route('/generate-all-posts', methods=['GET'])
     @jwt_required()
@@ -125,7 +127,9 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh,
         all_posts = posth.getAllPosts()
         loaded_posts = generateh.load_posts(all_posts)
 
-        return jsonify({'data': loaded_posts})
+        out = {'username': loaded_posts[0]}, {'text': loaded_posts[1]}, {'time': loaded_posts[2]}
+
+        return jsonify({'data': out})
 
     @app.route('/generate-friends-posts', methods=['GET'])
     @jwt_required()
@@ -135,7 +139,9 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh,
         friends_posts = posth.getFriendsPosts(user_id)
         loaded_posts = generateh.load_posts(friends_posts)
 
-        return jsonify({'data': loaded_posts})
+        out = {'username': loaded_posts[0]}, {'text': loaded_posts[1]}, {'time': loaded_posts[2]}
+
+        return jsonify({'data': out})
 
 #----------------------------Route----------------------------------------------
 
@@ -154,30 +160,27 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh,
 
             recommended_estabs = kmeansh.sortClass(prediction, pred, names)
 
-            return jsonify({'data': {'Recommended_establishments': recommended_estabs}})
+            return jsonify({'data': {'Recommended_establishments': str(recommended_estabs)}})
         except Exception as e:
             print(e)
             return jsonify({'message': 'Unable to produce recommended establishments'})
 
 
-    @app.route('/get-route', methods=['GET'])
+    @app.route('/get-route-locations', methods=['GET'])
     def getRouteLocations():
         # produces x number of establishment names for the route planner
 
         try:
-            data = request.get_json()
-            start_point = data.get('Start Point')
-            distance = data.get('Distance')
+            start_point = request.args.get('Start Point')
+            distance = request.args.get('Distance')
             routeh.createRoute(start_point, 7, distance)
             location_names = routeh.getFinalRoute()['place_name']
             location_ids = routeh.getFinalRoute()['place_id']
             location_coords = routeh.getFinalRoute()['place_coord']
 
-            list_of_dict = []
-            for i in range(len(location_names)):
-                list_of_dict.append({'location_names': location_names[i], 'location_ids': location_ids[i], 'location_coords': location_coords[i]})
+            out = {'location_names': location_names, 'location_ids': location_ids, 'location_coords': location_coords}
 
-            return jsonify({'data': list_of_dict})
+            return jsonify({'data': out})
         except Exception as e:
 
             return jsonify({'message': 'Unable to create route'})
