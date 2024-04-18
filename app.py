@@ -27,6 +27,7 @@ try:
         port=os.getenv("SECRET_DB_PORT"),
         ssl_ca=os.getenv("SECRET_DB_SSL_CA"),
         ssl_disabled=False
+        #ssl_verify_identity = False
     )
 
     if db.is_connected():
