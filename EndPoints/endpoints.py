@@ -179,7 +179,7 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth):
         drink_name  = "drink"+number
         user_id = get_jwt_identity()
         data = (drink_name, new_name, user_id)
-        query = "UPDATE user_preferences SET %s = %s user_id =%s" 
+        query = "UPDATE user_preferences SET %s = %s WHERE user_id =%s" 
         if queryh.run_query(query,data,False):
             return jsonify({"message": "data successfully updated"}),200
         else:
@@ -190,7 +190,7 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth):
     @jwt_required()
     def get_establishments():
         user_id = get_jwt_identity()
-        query = "SELECT est_1, est_2, est_3 FROM user_preferences WHERE user_id ==%s"
+        query = "SELECT est_1, est_2, est_3 FROM user_preferences WHERE user_id =%s"
         estbalishmnent_list = queryh.run_query(query, user_id, True)
         return jsonify({'data': estbalishmnent_list})
 
@@ -198,7 +198,7 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth):
     @jwt_required()
     def get_drinks():
         user_id = get_jwt_identity()
-        query = "SELECT drink_1, drink_2, drink_3 FROM user_preferences WHERE user_id ==%s"
+        query = "SELECT drink_1, drink_2, drink_3 FROM user_preferences WHERE user_id =%s"
         estbalishmnent_list = queryh.run_query(query, user_id, True)
         return jsonify({'data': estbalishmnent_list}) 
     
@@ -238,15 +238,20 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth):
     @app.route('/get-reviews', methods = ['GET'])
     @jwt_required()
     def get_establishment_reviews():
-        pubid = request.get_json("est_id")
-        query = "SELECT user_id, stars FROM reviews WHERE "
+        est_id = request.get_json("est_id")
+        query = "SELECT user_id, stars FROM reviews WHERE est_id = %s"
+        try:
+            results=  queryh.run_query(query, est_id,True)
+            return jsonify(results)
+        except:
+            return jsonify({"error":"reviews could not be retrieved"}), 400
 
     @app.route('/save-review',methods =['POST'])
     @jwt_required()
     def saveReview(self, userID, stars, public, text):
         user_id = get_jwt_identity()
         stars = request.get_json('stars')
-        query = "INSERT INTO Review (user_id, stars) VALUES (%s, %s)"
+        query = "INSERT INTO reviews (review_id,user_id, stars) VALUES (%s,%s, %s)"
         try:
             queryh.run_query(query, (user_id, stars))
             return jsonify({'message': 'Review saved successfully'}), 200
