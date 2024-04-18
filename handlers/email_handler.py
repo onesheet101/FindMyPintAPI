@@ -1,5 +1,6 @@
 from email.message import EmailMessage
 import smtplib
+import sys
 
 def send_confirmation(email_receiver, context, config, email_password):
     email_sender = config.get('EMAIL', 'SENDER')
@@ -18,5 +19,5 @@ def send_confirmation(email_receiver, context, config, email_password):
             smtp.login(email_sender, email_password)
             smtp.sendmail(email_sender, email_receiver, confirmation.as_string())
             return True
-    except:
+    except Exception as e:
         return False

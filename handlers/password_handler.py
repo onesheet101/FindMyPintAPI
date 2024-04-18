@@ -36,8 +36,8 @@ class PasswordHandler():
                 return False
 
 
-    def store_password(self, username, hashed_password, hashed_email):
-        return self.queryh.add_new_sensitive_record(username, hashed_password, hashed_email)
+    def store_password(self, username, hashed_password, hashed_email, queryh):
+        return queryh.add_new_user_sensitive_record(username, hashed_password, hashed_email)
 
     def update_password(self, username, hashed_password):
         with self.db.cursor() as cursor:

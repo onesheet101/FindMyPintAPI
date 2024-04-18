@@ -72,13 +72,13 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth):
 
         email_password = os.getenv('SECRET_EMAIL_KEY')
         if not send_confirmation(email, context, config, email_password):
-            return jsonify({"error": "Email could not be sent, registration failed"}), 400
+            return jsonify({"error": "Email could not be sent, registration failed"}), 402
 
         hashed_password = passwordh.hash_string(password)
         hashed_email = passwordh.hash_string(email)
 
         # store hashed_password with the username in the database again need to work on implementing database functionality.
-        if passwordh.store_password(username, hashed_password, hashed_email):
+        if passwordh.store_password(username, hashed_password, hashed_email, queryh):
             return jsonify({"message": "User registered successfully"}), 201
         else:
             return jsonify({"error": "Problem adding database record"}), 400
