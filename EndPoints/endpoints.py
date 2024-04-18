@@ -118,7 +118,7 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh,
 
         out = {'username': loaded_posts[0], 'text': loaded_posts[1], 'time': loaded_posts[2]}
 
-        return jsonify({'data': out})
+        return jsonify({'data': out}), 200
 
     @app.route('/generate-all-posts', methods=['GET'])
     @jwt_required()
@@ -129,7 +129,7 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh,
 
         out = {'username': loaded_posts[0]}, {'text': loaded_posts[1]}, {'time': loaded_posts[2]}
 
-        return jsonify({'data': out})
+        return jsonify({'data': out}), 200
 
     @app.route('/generate-friends-posts', methods=['GET'])
     @jwt_required()
@@ -141,7 +141,7 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh,
 
         out = {'username': loaded_posts[0]}, {'text': loaded_posts[1]}, {'time': loaded_posts[2]}
 
-        return jsonify({'data': out})
+        return jsonify({'data': out}), 200
 
 #----------------------------Route----------------------------------------------
 
@@ -160,10 +160,10 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh,
 
             recommended_estabs = kmeansh.sortClass(prediction, pred, names)
 
-            return jsonify({'data': {'Recommended_establishments': str(recommended_estabs)}})
+            return jsonify({'data': {'Recommended_establishments': str(recommended_estabs)}}), 200
         except Exception as e:
             print(e)
-            return jsonify({'message': 'Unable to produce recommended establishments'})
+            return jsonify({'message': 'Unable to produce recommended establishments'}), 400
 
 
     @app.route('/get-route-locations', methods=['GET'])
@@ -180,10 +180,9 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh,
 
             out = {'location_names': location_names, 'location_ids': location_ids, 'location_coords': location_coords}
 
-            return jsonify({'data': out})
+            return jsonify({'data': out}), 200
         except Exception as e:
-
-            return jsonify({'message': 'Unable to create route'})
+            return jsonify({'message': 'Unable to create route'}), 400
 
     @app.route('/save-route', methods=['POST'])
     @jwt_required()
@@ -194,8 +193,8 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh,
         route = request.get_json()
 
         if routeh.saveRoute(route, user_id):
-            return jsonify({'message': 'Route saved successfully'})
-        return jsonify({'message': 'Error: Unable to save route'})
+            return jsonify({'message': 'Route saved successfully'}), 200
+        return jsonify({'message': 'Error: Unable to save route'}), 400
 
 
 
