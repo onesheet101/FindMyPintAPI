@@ -82,7 +82,10 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth):
         # store hashed_password with the username in the database again need to work on implementing database functionality.
         if passwordh.store_password(username, hashed_password, hashed_email):
             try:
-                set_up_preferences()
+                query = "INSERT INTO new_user_preference (user_id, est1, est2, est3, drink1,drink2,drink3) VALUES (%s, %s, %s, %s,%s, %s, %s)"
+                user_id = get_jwt_identity()
+                data = (user_id, None, None, None,None,None,None)
+                queryh.run_query(query, data,False)
                 return jsonify({"message": "User registered successfully"}), 201
             except:
                 return jsonify({'error':"Problem occured setting up user preferences"}), 400

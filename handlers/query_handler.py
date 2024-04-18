@@ -41,9 +41,4 @@ class QueryHandler:
             except Exception as e:
                 return False 
             
-            
-    def set_up_preferences(self,user_id):
-        ##Insert into userpref table null values 
-        query = "INSERT INTO new_user_preference (user_id, est1, est2, est3, drink1,drink2,drink3) VALUES (%s, %s, %s, %s,%s, %s, %s)"
-        return  self.run_query(query,(user_id, None, None, None,None,None,None), False)
-            
+
