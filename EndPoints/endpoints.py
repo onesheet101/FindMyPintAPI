@@ -48,7 +48,7 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh,
 
     @app.route('/register', methods=['POST'])
     def register():
-        user_table = "new_sensitive_data"
+        user_table = "new_user_sensitive"
         data = request.get_json()
 
         username = data.get('username')
