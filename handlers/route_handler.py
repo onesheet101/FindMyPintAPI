@@ -127,7 +127,7 @@ class GoogleMapsAPI:
             lat = place['lat']
             lon = place['lng']
 
-            return lon, lat
+            return lat, lon
         except Exception as e:
             return False
 
@@ -297,7 +297,9 @@ class KMeans:
 
     def predictClass(self, coords):
 
-        datum = self.formDataset(self.gm.produceSingleAttribute(coords))
+        gme = GoogleMapsAPI(self.gm)
+
+        datum = self.formDataset(gme.produceSingleAttribute(coords))
 
         prediction = self.model.predict(datum)
 
@@ -343,7 +345,7 @@ class Route:
 
         iniPred = kme.predictClass(sp)
 
-        for i in range(len(pred) - 1):
+        for i in range(len(pred)-1):
             if iniPred == pred[i]:
 
                 correctPlaces.append(placeNames[i])
@@ -354,6 +356,7 @@ class Route:
         correct_place_id = self.removeDuplicates(correct_place_id)
         correct_coords = self.removeDuplicates(correct_coords)
 
+
         if len(correctPlaces) >= no_of_estab:
             self.finalRoute = correctPlaces[:no_of_estab]
             self.final_route_id = correct_place_id[:no_of_estab]
@@ -363,7 +366,7 @@ class Route:
                 self.list_of_dict.append({'place_name': self.finalRoute[i], 'place_id': self.final_route_id[i], 'place_coords': self.final_route_coords[i]})
             return True  # need to only return number of estab amount
         else:
-            self.createRoute(sp, (classNo - 1), no_of_estab)
+            self.createRoute(sp, (classNo - 2), no_of_estab)
 
     def removeDuplicates(self, data):
 
@@ -393,3 +396,4 @@ class Route:
         except Exception as e:
             print(e)
             return False
+
