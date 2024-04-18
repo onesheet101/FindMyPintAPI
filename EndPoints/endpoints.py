@@ -81,7 +81,7 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth):
         if passwordh.store_password(username, hashed_password, hashed_email, queryh):
             return jsonify({"message": "User registered successfully"}), 201
         else:
-            return jsonify({"error": "Problem adding database record"}), 502
+            return jsonify({"error": "Problem adding database record"}), 410
 
 
 #-----------------------Post Handling----------------------------------------------------------------------
