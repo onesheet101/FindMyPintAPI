@@ -200,7 +200,7 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh,
         return jsonify({'message': 'Error: Unable to save route'}), 400
 
     @app.route('/get-estabs-around-point', methods=['GET'])
-    @jwt_required()
+    #@jwt_required()
     def get_estabs():
 
         data = request.get_json()
