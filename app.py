@@ -9,7 +9,10 @@ from configparser import ConfigParser
 from handlers.password_handler import PasswordHandler
 from handlers.query_handler import QueryHandler
 from handlers.post_handler import PostHandler
+from handlers.generate_posts_handler import Generate
+from handlers.route_handler import GoogleMapsAPI, KMeans, Route
 from dotenv import load_dotenv
+import googlemaps
 
 #Make sure to change this before pushing!
 #load_dotenv('Hidden/.env')
@@ -48,14 +51,20 @@ app.config['JWT_SECRET_KEY'] = os.getenv("SECRET_FLASK_KEY") #Will import this f
 #This starts running the flask extension on top of it
 jwt = JWTManager(app)
 
+#This initialises an instance of the google maps api client that is passed into classes
+gm = googlemaps.Client(key=os.getenv('SECRET_GET_API_KEY'))
+
 #Create Handler Instances
 passwordh = PasswordHandler(db)
 queryh = QueryHandler(db)
 posth = PostHandler(db)
-
+generateh = Generate(db)
+gmapsh = GoogleMapsAPI(gm)
+kmeansh = KMeans(gm)
+routeh = Route(gm, db)
 
 #This passes the flask and extension objects to the endpoint functions so they can use their library methods.
-setup_endpoints(app, jwt, context, config, passwordh, queryh, posth)
+setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh, kmeansh, routeh, generateh)
 
 if __name__ == '__main__':
     #Starts flask
