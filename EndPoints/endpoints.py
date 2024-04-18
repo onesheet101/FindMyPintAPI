@@ -21,7 +21,7 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth):
 
         #If the user is authenticated create a token that lasts for thirty minutes and return it to them.
         if passwordh.authenticate_user(username, password, queryh):
-            user_id = queryh.get_record_item(username, "user_id", "username", "userpassword")
+            user_id = queryh.get_record_item(username, "user_id", "username", "user_sensitive")
             access_token = create_access_token(identity=user_id)
             return jsonify({'message': 'Login successful'}), 200, {'Authorization': access_token}
         else:
