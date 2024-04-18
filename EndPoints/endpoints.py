@@ -188,14 +188,14 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth):
             return jsonify({"error": "Database not updated"}),400
 
 
-    @app.route('/get-establishments', methods = ['GET'])
+    @app.route('/get-account-establishments', methods = ['GET'])
     @jwt_required()
-    def get_establishments():
+    def get_account_establishments():
         user_id = get_jwt_identity()
         query = "SELECT est_1, est_2, est_3 FROM user_preferences WHERE user_id =%s"
         estbalishmnent_list = queryh.run_query(query, user_id, True)
         return jsonify({'data': estbalishmnent_list})
-
+    
     @app.route('/get-drinks', methods = ['GET'])
     @jwt_required()
     def get_drinks():
@@ -204,7 +204,7 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth):
         estbalishmnent_list = queryh.run_query(query, user_id, True)
         return jsonify({'data': estbalishmnent_list}) 
     
-
+    
 
 #-----------------------Route Handling----------------------------------------------------------------------
     @app.route('/get-community-route',methods= ['GET'])
