@@ -221,7 +221,8 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh,
             coords = (request.args.get('lat'), request.args.get('lon'))
             details = gmapsh.get_establishment_details(coords)
             return jsonify({'data': details}), 200
-        except Erro
+        except Exception as e:
+            return jsonify({'error': 'Unable to get details'}), 400
 #------------------------------------Accounts---------------------------------------------------
 
     @app.route('/update-establishment', methods=['POST'])
