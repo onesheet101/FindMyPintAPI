@@ -20,7 +20,7 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh,
         if not username or not password:
             return jsonify({"error": "Missing username or password"}), 400
 
-        #If the user is authenticated create a token that lasts for thirty minutes and return it to them.
+        #If the user is authenticated create a token that lasts for 5 hours and return it to them.
         if passwordh.authenticate_user(username, password, queryh):
             user_id = queryh.get_record_item(username, "user_id", "username", "user_sensitive")
             expires = timedelta(hours=5)
