@@ -150,7 +150,7 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth):
     def get_friend_feed():
         try:
             user_id = get_jwt_identity()
-            query = "SELECT following_user_id FROM following WHERE user_id = ?"
+            query = "SELECT following_user_id FROM following WHERE user_id = %s"
             friend_list = queryh.run_query(query, (user_id,), True)
 
             friend_feed = []
