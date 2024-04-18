@@ -41,7 +41,7 @@ class PasswordHandler():
 
     def update_password(self, username, hashed_password):
         with self.db.cursor() as cursor:
-            query = "UPDATE userpassword SET hashed_password = %s WHERE username = %s"
+            query = "UPDATE user_sensitive SET hashed_password = %s WHERE username = %s"
 
             cursor.execute(query, (hashed_password, username))
 
