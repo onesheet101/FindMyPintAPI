@@ -183,6 +183,7 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh,
             distance = data.get('distance')
             routeh.createRoute(start_point, 7, distance)
             full_route = routeh.getFinalRoute()
+            full_route = full_route[:9]
 
             return jsonify({'data': full_route}), 200
             #return jsonify({'message': 'ok'}), 200
