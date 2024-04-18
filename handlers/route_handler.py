@@ -347,19 +347,21 @@ class Route:
         for i in range(len(pred) - 1):
             if iniPred == pred[i]:
 
-                for i in range(len(placeNames)):
-                    self.list_of_dict.append({'correct_place': placeNames[i], 'place_id': correct_place_id[i], 'place_coords': correct_coords[i]})
-
-                #correctPlaces.append(placeNames[i])
-                #correct_place_id.append(place_id[i])
-                #correct_coords.append(gme.get_coords(placeNames[i]))
+                correctPlaces.append(placeNames[i])
+                correct_place_id.append(place_id[i])
+                correct_coords.append(gme.get_coords(placeNames[i]))
 
         correctPlaces = self.removeDuplicates(correctPlaces)
+        correct_place_id = self.removeDuplicates(correct_place_id)
+        correct_coords = self.removeDuplicates(correct_coords)
 
         if len(correctPlaces) >= no_of_estab:
             self.finalRoute = correctPlaces[:no_of_estab]
             self.final_route_id = correct_place_id[:no_of_estab]
             self.final_route_coords = correct_coords[:no_of_estab]
+            #Move selected place names, route ids and coords into list of dictionary format
+            for i in range(len(self.finalRoute)):
+                self.list_of_dict.append({'place_name': self.finalRoute[i], 'place_id': self.final_route_id[i], 'place_coords': self.final_route_coords[i]})
             return True  # need to only return number of estab amount
         else:
             self.createRoute(sp, (classNo - 1), no_of_estab)
@@ -374,7 +376,6 @@ class Route:
         return out
 
     def getFinalRoute(self):
-
         return self.list_of_dict
 
     def saveRoute(self, route, user_id):

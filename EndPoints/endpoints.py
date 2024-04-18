@@ -116,9 +116,7 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh,
         fy_posts = posth.getRecommendedPosts(user_id)
         loaded_posts = generateh.load_posts(fy_posts)
 
-        out = {'username': loaded_posts[0], 'text': loaded_posts[1], 'time': loaded_posts[2]}
-
-        return jsonify({'data': out})
+        return jsonify({'data': loaded_posts})
 
     @app.route('/generate-all-posts', methods=['GET'])
     @jwt_required()
@@ -127,9 +125,7 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh,
         all_posts = posth.getAllPosts()
         loaded_posts = generateh.load_posts(all_posts)
 
-        out = {'username': loaded_posts[0]}, {'text': loaded_posts[1]}, {'time': loaded_posts[2]}
-
-        return jsonify({'data': out})
+        return jsonify({'data': loaded_posts})
 
     @app.route('/generate-friends-posts', methods=['GET'])
     @jwt_required()
@@ -139,9 +135,7 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh,
         friends_posts = posth.getFriendsPosts(user_id)
         loaded_posts = generateh.load_posts(friends_posts)
 
-        out = {'username': loaded_posts[0]}, {'text': loaded_posts[1]}, {'time': loaded_posts[2]}
-
-        return jsonify({'data': out})
+        return jsonify({'data': loaded_posts})
 
 #----------------------------Route----------------------------------------------
 
@@ -169,18 +163,14 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh,
     @app.route('/get-route-locations', methods=['GET'])
     def getRouteLocations():
         # produces x number of establishment names for the route planner
-
         try:
-            start_point = request.args.get('Start Point')
-            distance = request.args.get('Distance')
+            data = request.get_json()
+            start_point = data.get('start_point')
+            distance = data.get('distance')
             routeh.createRoute(start_point, 7, distance)
-            location_names = routeh.getFinalRoute()['place_name']
-            location_ids = routeh.getFinalRoute()['place_id']
-            location_coords = routeh.getFinalRoute()['place_coord']
+            full_route = routeh.getFinalRoute()
 
-            out = {'location_names': location_names, 'location_ids': location_ids, 'location_coords': location_coords}
-
-            return jsonify({'data': out})
+            return jsonify({'data': full_route})
         except Exception as e:
 
             return jsonify({'message': 'Unable to create route'})
