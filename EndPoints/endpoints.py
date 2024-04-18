@@ -163,6 +163,7 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh,
     @app.route('/get-route', methods=['GET'])
     def getRouteLocations():
         # produces x number of establishment names for the route planner
+
         try:
             data = request.get_json()
             start_point = data.get('start_point')
