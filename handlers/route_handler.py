@@ -250,6 +250,12 @@ class GoogleMapsAPI:
     def getPlaceIDs(self):
         return self.placeIDs
 
+    def get_establishment_details(self, coords):
+
+        details = self.produceSingleAttribute(coords)
+
+        return details
+
 
 class KMeans:
     model = ''
@@ -404,7 +410,7 @@ class Route:
 
             out = jsonify({'data': list_of})
 
-            query = 'INSERT INTO saved_routes VALUES(%s, %s)'
+            query = 'INSERT INTO saved_routes VALUES(%s, %s, %s)'
             self.db.execute(query, out, placenames)
             self.db.commit()
 
