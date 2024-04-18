@@ -39,7 +39,7 @@ class PostHandler:
             else:
                 return False
 
-    def deletePost(self, postID):
+    def delete_post(self, postID):
         query = "DELETE FROM new_post WHERE PostID = %s"
         try:
             self.db.execute(query, (postID))
