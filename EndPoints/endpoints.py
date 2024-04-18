@@ -202,6 +202,7 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh,
     @app.route('/get-estabs-around-point', methods=['GET'])
     #@jwt_required()
     def get_estabs():
+        #get list of establishments around a set of coordinates
 
         data = request.get_json()
         coords = data.get('coordinates')
