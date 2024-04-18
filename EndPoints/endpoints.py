@@ -2,6 +2,7 @@ from flask import request, jsonify
 from handlers.email_handler import *
 from flask_jwt_extended import jwt_required, create_access_token, get_jwt_identity
 from datetime import timedelta
+import sys
 import os
 
 
@@ -299,7 +300,7 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh,
             return jsonify({'data': full_route}), 200
             #return jsonify({'message': 'ok'}), 200
         except Exception as e:
-            print(e)
+            print(e, file=sys.stderr)
             return jsonify({'message': 'Unable to create route'}), 400
 
     @app.route('/save-route', methods=['POST'])
