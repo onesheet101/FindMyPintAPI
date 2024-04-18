@@ -289,7 +289,7 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh,
 
         try:
             start_point = (request.args.get('lat'), request.args.get('lon')) 
-            distance = (request.args.get('num'))
+            distance = request.args.get('num')
 
             int_distance = int(distance)
             
