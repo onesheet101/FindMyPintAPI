@@ -115,7 +115,7 @@ class GoogleMapsAPI:
         ou = []
 
         for i in range(len(placeNames)):
-            ou.append({'place_names': placeNames[i], 'place_ids': placeIDs[i], 'lat': (crds[i])[0], 'lon': (crds[i])[1]})
+            ou.append({'est_name': placeNames[i], 'est_id': placeIDs[i], 'lat': (crds[i])[0], 'lon': (crds[i])[1]})
 
         return ou
 
@@ -362,8 +362,10 @@ class Route:
             self.final_route_id = correct_place_id[:no_of_estab]
             self.final_route_coords = correct_coords[:no_of_estab]
             #Move selected place names, route ids and coords into list of dictionary format
-            for i in range(len(self.finalRoute)):
-                self.list_of_dict.append({'place_name': self.finalRoute[i], 'place_id': self.final_route_id[i], 'place_coords': self.final_route_coords[i]})
+            self.list_of_dict.append({'est_name': self.finalRoute[0], 'est_id': self.final_route_id[0],
+                                      'lon': sp[0], 'lat': sp[1]})
+            for i in range(1, len(self.finalRoute)):
+                self.list_of_dict.append({'est_name': self.finalRoute[i], 'est_id': self.final_route_id[i], 'lon': (self.final_route_coords[i])[0], 'lat': (self.final_route_coords)[1]})
             return True  # need to only return number of estab amount
         else:
             self.createRoute(sp, (classNo - 2), no_of_estab)
