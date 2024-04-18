@@ -122,19 +122,47 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth):
         else:
             return jsonify({'error': 'User does not own that post'}), 403
 
-    @app.route('/get-friend-feed')
+    @app.route('/get_feed',methods = ['GET'])
+    @jwt_required()
+    def get_feed():
+        ##Get posts 
+        query = "SELECT post_body,user_id FROM post"
+
+        posts =queryh.get_posts(query,None,True) ##Gets 10 results 
+        post_list= []
+
+        for post in posts:
+            #Get Username 
+            query = "SELECT username FROM user_sensitive WHERE user = %s"
+            userid = post[1]
+            username  = queryh.run_query(query, (userid,),True)
+            text = post[0]
+            post_dict  = {'username': username, 
+                            'text': text}
+            post_list.append(post_dict)
+        return jsonify(post_list)
+
+
+    @app.route('/get-friend-feed',methods = ['GET'])
     @jwt_required()
     def get_friend_feed():
+        ##Get friend list
+        ##For each friend get posts 
+        #
         try:
             user_id = get_jwt_identity()
             query  = "SELECT following_user_id FROM following WHERE userid = %s"
             friend_list = queryh.run_query(query,(user_id,), True)
             for friend_id in friend_list:
-                query = "SELECT post_body WHERE user_id = %s"
-                queryh.run_query(query, (friend_id,),True)
-                
-    except:
-        return jsonify({"error":"posts could not be retrieved"}),400
+                #Get Post text
+                query = "SELECT post_body FROM following WHERE user_id = %s"
+                text = queryh.run_query(query, (friend_id,),True)
+                #Get Username 
+                query = "SELECT username FROM user_sensitive WHERE userid = %s"
+                queryh.run_query(query, ())
+        except:
+            return jsonify({"error":"posts could not be retrieved"}),400
+        
 #-----------------------Account Handling----------------------------------------------------------------------
     @app.route('/get-account', methods = ['GET'])
     @jwt_required()
@@ -229,12 +257,11 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth):
     @jwt_required() 
     def get_route():
         routeid = request.get_json("route_id")
-        query = "SELECT est_list FROM SavedRoutes WHERE RouteID =%s"
+        query = "SELECT est_list FROM saved_routes WHERE route_id =%s"
         route_list = []
         est_list = queryh.run_query(query,routeid,True)
         for id in est_list:
-            query = "SELECT est_id, Name, Lat, Lon FROM Establishment WHERE est_id = %s"
-
+            query = "SELECT est_id, name, lat, lon FROM establishment WHERE est_id = %s"
             est_info = queryh.run_query(query,id,True)
             location_dict = {
             'est_id': est_info[0],

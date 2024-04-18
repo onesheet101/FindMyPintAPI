@@ -29,6 +29,14 @@ class QueryHandler:
             except Exception as e:
                 return False
 
+    def get_posts(self, query, data):
+        with self.db.cursor() as cursor:
+            try:
+                cursor.execute(query,data)
+                results = cursor.fetchmany(10)
+                return results 
+            except:
+                return False 
     def run_query(self,query, data = None, fetch_results = False):#Data is a tuple, query is the string with placeholders 
         with self.db.cursor() as cursor:
             try:
