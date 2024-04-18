@@ -28,7 +28,7 @@ class Generate:
         # get post data for the list of postID's
 
         try:
-            query = 'SELECT UserID, Time, Text, Photo, LikeList, EstablishmentID FROM Post WHERE PostID=%s'
+            query = 'SELECT user_id, time, post_body, FROM Post WHERE post_id=%s'
 
             self.allPosts = []
 
@@ -91,7 +91,7 @@ class Generate:
     def getUsername(self, userIDList):
         # given a list of user IDs find the account username that it corresponds to - accept lists of 1 also
         try:
-            query = 'SELECT Username FROM Account WHERE UserID=%s'
+            query = 'SELECT username FROM user_sensitive WHERE user_id=%s'
 
             usernames = []
             for i in userIDList:
