@@ -53,14 +53,12 @@ class PasswordHandler():
         return hashed_string
 
     def check_user_pass_validity(self, password):
-        if " " in password:
+        passlength = len(password)
+        if passlength <= 7 or passlength > 16:
             return False
-            passlength = len(password)
-            if passlength <= 7 or passlength > 16:
-                return False
-            if not password.isascii():
-                return False
-            return True
+        if not password.isascii():
+            return False
+        return True
 
 
 
