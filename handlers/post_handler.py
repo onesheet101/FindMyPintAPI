@@ -7,11 +7,11 @@ class PostHandler:
         self.db = db
         self.gm = gm
 
-    def upload_post(self, user_id, body):
-        query = "INSERT INTO post (user_id, body) VALUES (%s, %s)"
+    def upload_post(self, user_id, body, lat, long):
+        query = "INSERT INTO post (user_id, body, latitude, longitude) VALUES (%s, %s, %s, %s)"
         try:
             with self.db.cursor() as cursor:
-                self.db.execute(query, (user_id, body))
+                self.db.execute(query, (user_id, body, lat, long))
                 self.db.commit()
                 return jsonify({'message': 'Post uploaded success'}), 200
         except Exception as e:
