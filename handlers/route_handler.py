@@ -2,6 +2,7 @@ import math
 import copy
 import numpy
 from sklearn.cluster import KMeans as km
+from flask import jsonify
 import googlemaps as gmaps
 import warnings
 
@@ -130,6 +131,14 @@ class GoogleMapsAPI:
             return lat, lon
         except Exception as e:
             return False
+
+    def get_place_ids(self, lat, lon):
+
+        rev_loc = self.gm.reverse_geocode(lat, lon)
+
+        est_id = rev_loc[0]['place_id']
+
+        return est_id
 
     def correctFormat(self, data):
         # data is the list of dict for the establishment data
@@ -386,12 +395,17 @@ class Route:
 
         try:
             rte = []
-            for i in route:
-                rte.append(str(i) + ',')
+            gme = GoogleMapsAPI(self.gm)
 
-            query = 'UPDATE SavedRoutes SET VALUES(COUNT(RouteID) + 1, %s, %s, %s, %s)'
-            query = 'INSERT INTO new_saved_routes VALUES()'
-            self.db.execute(query, 0, len(route), route, 0, user_id)
+            list_of = []
+            for i in route:
+                crds = gme.get_coords(i)
+                list_of.append({'est_id': gme.getPlaceIDs(crds[0], crds[1]), 'est_name': gme.getEstabs(crds), 'lat': crds[0], 'lon': crds[1]})
+
+            out = jsonify({'data': list_of})
+
+            query = 'INSERT INTO saved_routes VALUES(%s, %s)'
+            self.db.execute(query, out, placenames)
             self.db.commit()
 
             return True
