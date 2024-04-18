@@ -57,13 +57,13 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth):
 
         # Checks if any fields are empty again.
         if not username or not password or not email:
-            return jsonify({"error": "Missing a parameter"}), 400
+            return jsonify({"error": "Missing a parameter"}), 403
 
         if not passwordh.check_user_pass_validity(password):
-            return jsonify({"error": "Password format incorrect"}), 400
+            return jsonify({"error": "Password format incorrect"}), 404
 
         if not passwordh.check_user_pass_validity(username):
-            return jsonify({"error": "Username format incorrect"}), 400
+            return jsonify({"error": "Username format incorrect"}), 405
 
         # check and see if username exists in database need to set up interface!!!
         # If user exists return error code and message.
@@ -81,7 +81,7 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth):
         if passwordh.store_password(username, hashed_password, hashed_email, queryh):
             return jsonify({"message": "User registered successfully"}), 201
         else:
-            return jsonify({"error": "Problem adding database record"}), 400
+            return jsonify({"error": "Problem adding database record"}), 40409
 
 
 #-----------------------Post Handling----------------------------------------------------------------------
