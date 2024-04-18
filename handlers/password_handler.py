@@ -7,20 +7,20 @@ class PasswordHandler():
 
     def authenticate_user(self, username, password, queryh):
 
-        #check and see if username exists in database need to set up interface!!!
+        #Check and see if username exists in database.
         if self.does_user_exist(username, "user_sensitive") is False:
             return False
 
-        #hashed_password will need to be retrieved from database where given username matches the username in table.
+        #Retrieve hashed_password from database.
         hashed_password = queryh.get_record_item(username, "hashed_password", "username", "user_sensitive").encode('utf-8')
 
-        #This hashes the given password then compares hashed password that is stored.
+        #Compares hashed password, with given password and returns true if they are the same.
         if bcrypt.checkpw(password.encode('utf-8'), hashed_password):
             return True
         else:
             return False
 
-
+    #Checks if username exists in database.
     def does_user_exist(self, username, table):
         with self.db.cursor() as cursor:
 
@@ -35,10 +35,11 @@ class PasswordHandler():
             else:
                 return False
 
-
+    #Stores hashed_password in database with username and hashed_email.
     def store_password(self, username, hashed_password, hashed_email, queryh):
         return queryh.add_user_sensitive_record(username, hashed_password, hashed_email)
 
+    #Updates hashed password for a username in database.
     def update_password(self, username, hashed_password):
         with self.db.cursor() as cursor:
             query = "UPDATE user_sensitive SET hashed_password = %s WHERE username = %s"
