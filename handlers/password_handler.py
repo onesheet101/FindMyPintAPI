@@ -8,11 +8,11 @@ class PasswordHandler():
     def authenticate_user(self, username, password, queryh):
 
         #check and see if username exists in database need to set up interface!!!
-        if self.does_user_exist(username, "userpassword") is False:
+        if self.does_user_exist(username, "new_user_sensitive") is False:
             return False
 
         #hashed_password will need to be retrieved from database where given username matches the username in table.
-        hashed_password = queryh.get_record_item(username, "hashed_password", "username", "userpassword").encode('utf-8')
+        hashed_password = queryh.get_record_item(username, "hashed_password", "username", "new_user_sensitive").encode('utf-8')
 
         #This hashes the given password then compares hashed password that is stored.
         if bcrypt.checkpw(password.encode('utf-8'), hashed_password):
