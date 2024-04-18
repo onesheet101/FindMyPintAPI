@@ -79,12 +79,15 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh,
 
         # store hashed_password with the username in the database again need to work on implementing database functionality.
         if passwordh.store_password(username, hashed_password, hashed_email, queryh):
+            user_id = queryh.get_user_id(username)
+            query = "INSERT INTO user_preference (user_id, est_1, est_2, est_3, drink_1, drink_2, drink_3) VALUES (%s, %s, %s, %s, %s, %s, %s)"
+            data = (user_id, "N/A", "N/A", "N/A", "Corona", "Corona", "Corona")
+            queryh.run_query(query, data, False)
             return jsonify({"message": "User registered successfully"}), 201
         else:
             return jsonify({"error": "Problem adding database record"}), 410
 
-
-#-----------------------Post Handling----------------------------------------------------------------------
+    #-----------------------Post Handling----------------------------------------------------------------------
     @app.route('/upload-post', methods=['POST'])
     @jwt_required()
     def upload_post():
@@ -199,8 +202,8 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh,
             return jsonify({'message': 'Route saved successfully'}), 200
         return jsonify({'message': 'Error: Unable to save route'}), 400
 
-    @app.route('/get-estabs-around-point', methods=['GET'])
-    #@jwt_required()
+    @app.route('/get-estabs-around-point', methods=['POST'])
+    @jwt_required()
     def get_estabs():
         #get list of establishments around a set of coordinates.
 
@@ -209,6 +212,16 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh,
         places = gmapsh.getEstabs(coords)
 
         return jsonify({'data': places})
+
+    @app.route('/get-estab-details', methods=['GET']
+    @jwt_required()
+    def get_estab_details():
+
+        data = request.get_json()
+        coords = data.get('coordinates')
+        details = gmapsh.get_establishment_details(coords)
+
+        return jsonify({'data': details})
 
 #------------------------------------Accounts---------------------------------------------------
 
@@ -222,8 +235,8 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh,
         est_name  = "est_"+number
         user_id = get_jwt_identity()
         data = (est_name, new_name, user_id)
-        query = "UPDATE user_preferences SET %s = %s user_id =%s"
+        query = "UPDATE user_preferences SET %s = %s WHERE user_id =%s"
         if queryh.run_query(query,data,False):
-            return jsonify({"message": "data successfully updated"}),200
+            return jsonify({"message": "data successfully updated"}), 200
         else:
-            return jsonify({"error": "Database not updated"}),400
+            return jsonify({"error": "Database not updated"}), 400

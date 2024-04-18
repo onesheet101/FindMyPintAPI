@@ -1,3 +1,4 @@
+import sys
 class QueryHandler:
 
     def __init__(self, db):
@@ -29,7 +30,21 @@ class QueryHandler:
             except Exception as e:
                 return False
 
-    def run_query(self, query, data, fetch_results):  # Data is a tuple, query is the string with placeholders
+    def get_user_id(self, username):
+        with self.db.cursor() as cursor:
+            try:
+                query = f'SELECT user_id FROM user_sensitive WHERE username = %s'
+
+                cursor.execute(query, (username,))
+
+                record = cursor.fetchone()
+                print(record, file=sys.stderr)
+
+                return record[0]
+            except Exception as e:
+                return 0
+
+    def run_query(self, query, data = None, fetch_results = False):#Data is a tuple, query is the string with placeholders
         with self.db.cursor() as cursor:
             try:
                 cursor.execute(query, data)
@@ -37,6 +52,7 @@ class QueryHandler:
                     results = cursor.fetchall()  # Fetch all results if needed
                     return results
                 else:
+                    self.db.commit()
                     return True  # Query executed successfully
             except Exception as e:
                 return False
