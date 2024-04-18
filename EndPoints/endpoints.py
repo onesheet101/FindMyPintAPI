@@ -203,7 +203,7 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh,
         return jsonify({'message': 'Error: Unable to save route'}), 400
 
     @app.route('/get-estabs-around-point', methods=['POST'])
-    #@jwt_required()
+    @jwt_required()
     def get_estabs():
         #get list of establishments around a set of coordinates.
 
@@ -212,6 +212,16 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh,
         places = gmapsh.getEstabs(coords)
 
         return jsonify({'data': places})
+
+    @app.route('/get-estab-details', methods=['GET']
+    @jwt_required()
+    def get_estab_details():
+
+        data = request.get_json()
+        coords = data.get('coordinates')
+        details = gmapsh.get_establishment_details(coords)
+
+        return jsonify({'data': details})
 
 #------------------------------------Accounts---------------------------------------------------
 
