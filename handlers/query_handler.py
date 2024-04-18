@@ -29,3 +29,15 @@ class QueryHandler:
             except Exception as e:
                 return False
 
+    def run_query(self, query, data, fetch_results):  # Data is a tuple, query is the string with placeholders
+        with self.db.cursor() as cursor:
+            try:
+                cursor.execute(query, data)
+                if fetch_results:
+                    results = cursor.fetchall()  # Fetch all results if needed
+                    return results
+                else:
+                    return True  # Query executed successfully
+            except Exception as e:
+                return False
+

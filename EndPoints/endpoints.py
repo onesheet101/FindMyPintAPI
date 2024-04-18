@@ -206,4 +206,20 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh,
 
         return jsonify({'data': places})
 
-#-----------------------------------------------------------------------------------------------------------------
+#------------------------------------Accounts---------------------------------------------------
+
+    @app.route('/update-establishment', methods=['POST'])
+    @jwt_required()
+    def update_establishment():
+        #Find what estbalishments needs updating
+        data = request.get_json()
+        number  = data.get_json("number")
+        new_name  = data.get_json("est_name")
+        est_name  = "est_"+number
+        user_id = get_jwt_identity()
+        data = (est_name, new_name, user_id)
+        query = "UPDATE user_preferences SET %s = %s user_id =%s"
+        if queryh.run_query(query,data,False):
+            return jsonify({"message": "data successfully updated"}),200
+        else:
+            return jsonify({"error": "Database not updated"}),400
