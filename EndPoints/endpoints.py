@@ -214,7 +214,7 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh,
 
         return jsonify({'data': places})
 
-    @app.route('/get-estab-details', methods=['GET']
+    @app.route('/get-estab-details', methods=['GET'])
     @jwt_required()
     def get_estab_details():
 
