@@ -165,6 +165,7 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh,
         # produces x number of establishment names for the route planner
 
         try:
+
             data = request.get_json()
             start_point = data.get('start_point')
             distance = data.get('distance')
@@ -172,6 +173,7 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh,
             full_route = routeh.getFinalRoute()
 
             return jsonify({'data': full_route}), 200
+            #return jsonify({'message': 'ok'}), 200
         except Exception as e:
             print(e)
             return jsonify({'message': 'Unable to create route'}), 400
