@@ -79,12 +79,15 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh,
 
         # store hashed_password with the username in the database again need to work on implementing database functionality.
         if passwordh.store_password(username, hashed_password, hashed_email, queryh):
+            user_id = queryh.get_user_id(username)
+            query = "INSERT INTO user_preference (user_id, est1, est2, est3, drink1, drink2, drink3) VALUES (%s, %s, %s, %s, %s, %s, %s)"
+            data = (user_id, "N/A", "N/A", "N/A", "Corona", "Corona", "Corona")
+            queryh.run_query(query, data, False)
             return jsonify({"message": "User registered successfully"}), 201
         else:
             return jsonify({"error": "Problem adding database record"}), 410
 
-
-#-----------------------Post Handling----------------------------------------------------------------------
+    #-----------------------Post Handling----------------------------------------------------------------------
     @app.route('/upload-post', methods=['POST'])
     @jwt_required()
     def upload_post():
@@ -222,8 +225,8 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh,
         est_name  = "est_"+number
         user_id = get_jwt_identity()
         data = (est_name, new_name, user_id)
-        query = "UPDATE user_preferences SET %s = %s user_id =%s"
+        query = "UPDATE user_preferences SET %s = %s WHERE user_id =%s"
         if queryh.run_query(query,data,False):
-            return jsonify({"message": "data successfully updated"}),200
+            return jsonify({"message": "data successfully updated"}), 200
         else:
-            return jsonify({"error": "Database not updated"}),400
+            return jsonify({"error": "Database not updated"}), 400
