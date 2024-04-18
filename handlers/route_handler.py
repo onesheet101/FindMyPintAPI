@@ -251,8 +251,8 @@ class GoogleMapsAPI:
         return self.placeIDs
 
     def get_establishment_details(self, coords):
-
-        details = self.produceSingleAttribute(coords)
+        
+        details = self.getSingleAttribute(coords)
 
         return details
 
