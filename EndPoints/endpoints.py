@@ -129,29 +129,31 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth):
     @app.route('/get-account', methods = ['GET'])
     @jwt_required()
     def get_account_details(): 
-        user_id = get_jwt_identity()
+        try:
+            user_id = get_jwt_identity()
 
-        # Get username
-        username_query = "SELECT username FROM user_sensitive WHERE user_id = %s"
-        username = queryh.run_query(username_query, user_id, True)[0]
+            # Get username
+            username_query = "SELECT username FROM user_sensitive WHERE user_id = %s"
+            username = queryh.run_query(username_query, user_id, True)[0]
 
-        # Get establishments
-        est_list_query = "SELECT est_1, est_2, est_3 FROM user_preferences WHERE user_id = %s"
-        establishments = queryh.run_query(est_list_query, user_id, True)
+            # Get establishments
+            est_list_query = "SELECT est_1, est_2, est_3 FROM user_preferences WHERE user_id = %s"
+            establishments = queryh.run_query(est_list_query, user_id, True)
 
-        # Get drinks
-        drink_list_query = "SELECT drink_1, drink_2, drink_3 FROM user_preferences WHERE user_id = %s"
-        drinks = queryh.run_query(drink_list_query, user_id, True)
+            # Get drinks
+            drink_list_query = "SELECT drink_1, drink_2, drink_3 FROM user_preferences WHERE user_id = %s"
+            drinks = queryh.run_query(drink_list_query, user_id, True)
 
-        # Construct dictionary
-        account_details = {
-            'username': username,
-            'establishments': establishments,
-            'drinks': drinks
-        }
-
+            # Construct dictionary
+            account_details = {
+                'username': username,
+                'establishments': establishments,
+                'drinks': drinks
+            }
         # Return as JSON
-        return jsonify(account_details)
+            return jsonify({"message": account_details})
+        except:
+            return jsonify("error":"Account details could not be retrieved")
     
     @app.route('/update-establishments', methods  = ['POST'])
     @jwt_required()
