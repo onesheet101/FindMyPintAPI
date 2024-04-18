@@ -1,6 +1,7 @@
 from flask import request, jsonify
 from handlers.email_handler import *
 from flask_jwt_extended import jwt_required, create_access_token, get_jwt_identity
+from datetime import timedelta
 import os
 
 
@@ -22,7 +23,8 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh,
         #If the user is authenticated create a token that lasts for thirty minutes and return it to them.
         if passwordh.authenticate_user(username, password, queryh):
             user_id = queryh.get_record_item(username, "user_id", "username", "user_sensitive")
-            access_token = create_access_token(identity=user_id)
+            expires = timedelta(hours=5)
+            access_token = create_access_token(identity=user_id, expires_delta=expires)
             return jsonify({'message': 'Login successful'}), 200, {'Authorization': access_token}
         else:
             return jsonify({'error': 'Invalid username or password'}), 401
