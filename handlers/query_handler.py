@@ -17,10 +17,10 @@ class QueryHandler:
 
             return give_item
 
-    def add_new_user_sensitive_record(self, username, password, email):
+    def add_user_sensitive_record(self, username, password, email):
         with self.db.cursor() as cursor:
             try:
-                query = "INSERT INTO new_user_sensitive (username, password, email) VALUES (%s, %s, %s)"
+                query = "INSERT INTO user_sensitive (username, password, email) VALUES (%s, %s, %s)"
 
                 cursor.execute(query, (username, password, email))
 
