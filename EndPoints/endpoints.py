@@ -113,6 +113,97 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth):
         else:
             return jsonify({'error': 'User does not own that post'}), 403
 
+# -----------------------------------Generate Posts Handling--------------------------------------------
+
+    @app.route('/generate-recommended-posts', methods=['GET'])
+    @jwt_required()
+    def generateForYouPosts():
+
+        user_id = get_jwt_identity()
+        fy_posts = posth.getRecommendedPosts(user_id)
+        loaded_posts = generateh.load_posts(fy_posts)
+
+        return jsonify({'data': loaded_posts})
+
+    @app.route('/generate-all-posts', methods=['GET'])
+    @jwt_required()
+    def generateAllPosts():
+
+        all_posts = posth.getAllPosts()
+        loaded_posts = generateh.load_posts(all_posts)
+
+        return jsonify({'data': loaded_posts}), 200
+
+    @app.route('/generate-friends-posts', methods=['GET'])
+    @jwt_required()
+    def generateFriendsPosts():
+
+        user_id = get_jwt_identity()
+        friends_posts = posth.getFriendsPosts(user_id)
+        loaded_posts = generateh.load_posts(friends_posts)
+
+        return jsonify({'data': loaded_posts}), 200
+
+#----------------------------Route handling----------------------------------------------
+
+    @app.route('/get-recommended-establishments', methods=['GET'])
+    def getRecommendedestablishments():
+        # takes input coordinates and then produces establishments with the same classification around it
+
+        try:
+            start_point = request.args.get('start_point')
+            #re = Recommended.GoogleMapsAPI(startPoint, searchTerm)
+            attr = gmapsh.produceAttributes()
+            attr = kmeansh.formDataset(attr)
+            names = gmapsh.getPlaceNames()
+            pred = kmeansh.buildModel(attr, 7)
+            prediction = kmeansh.predictClass(start_point)
+
+            recommended_estabs = kmeansh.sortClass(prediction, pred, names)
+
+            return jsonify({'data': {'Recommended_establishments': str(recommended_estabs)}}), 200
+        except Exception as e:
+            print(e)
+            return jsonify({'message': 'Unable to produce recommended establishments'}), 400
 
 
+    @app.route('/get-route', methods=['GET'])
+    def getRouteLocations():
+        # produces x number of establishment names for the route planner
 
+        try:
+
+            data = request.get_json()
+            start_point = data.get('start_point')
+            distance = data.get('distance')
+            routeh.createRoute(start_point, 7, distance)
+            full_route = routeh.getFinalRoute()
+
+            return jsonify({'data': full_route}), 200
+            #return jsonify({'message': 'ok'}), 200
+        except Exception as e:
+            print(e)
+            return jsonify({'message': 'Unable to create route'}), 400
+
+    @app.route('/save-route', methods=['POST'])
+    @jwt_required()
+    def saveRoute():
+        # Take a list of establishments, convert them to a comma seperated string then save to database
+
+        user_id = get_jwt_identity()
+        route = request.get_json()
+
+        if routeh.saveRoute(route, user_id):
+            return jsonify({'message': 'Route saved successfully'}), 200
+        return jsonify({'message': 'Error: Unable to save route'}), 400
+
+    @app.route('/get-estabs-around-point', methods=['GET'])
+    def get_estabs():
+
+        data = request.get_json()
+        coords = data.get('coordinates')
+        places = gmapsh.getEstabs(coords)
+
+        return jsonify({'data': places})
+
+#-----------------------------------------------------------------------------------------------------------------
