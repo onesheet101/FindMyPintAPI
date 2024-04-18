@@ -125,7 +125,7 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh,
         all_posts = posth.getAllPosts()
         loaded_posts = generateh.load_posts(all_posts)
 
-        return jsonify({'data': loaded_posts})
+        return jsonify({'data': loaded_posts}), 200
 
     @app.route('/generate-friends-posts', methods=['GET'])
     @jwt_required()
@@ -135,7 +135,7 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh,
         friends_posts = posth.getFriendsPosts(user_id)
         loaded_posts = generateh.load_posts(friends_posts)
 
-        return jsonify({'data': loaded_posts})
+        return jsonify({'data': loaded_posts}), 200
 
 #----------------------------Route----------------------------------------------
 
@@ -154,10 +154,10 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh,
 
             recommended_estabs = kmeansh.sortClass(prediction, pred, names)
 
-            return jsonify({'data': {'Recommended_establishments': str(recommended_estabs)}})
+            return jsonify({'data': {'Recommended_establishments': str(recommended_estabs)}}), 200
         except Exception as e:
             print(e)
-            return jsonify({'message': 'Unable to produce recommended establishments'})
+            return jsonify({'message': 'Unable to produce recommended establishments'}), 400
 
 
     @app.route('/get-route', methods=['GET'])
@@ -171,10 +171,10 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh,
             routeh.createRoute(start_point, 7, distance)
             full_route = routeh.getFinalRoute()
 
-            return jsonify({'data': full_route})
+            return jsonify({'data': full_route}), 200
         except Exception as e:
 
-            return jsonify({'message': 'Unable to create route'})
+            return jsonify({'message': 'Unable to create route'}), 400
 
     @app.route('/save-route', methods=['POST'])
     @jwt_required()
@@ -185,8 +185,8 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh,
         route = request.get_json()
 
         if routeh.saveRoute(route, user_id):
-            return jsonify({'message': 'Route saved successfully'})
-        return jsonify({'message': 'Error: Unable to save route'})
+            return jsonify({'message': 'Route saved successfully'}), 200
+        return jsonify({'message': 'Error: Unable to save route'}), 400
 
 
 

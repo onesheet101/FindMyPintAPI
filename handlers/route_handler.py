@@ -315,12 +315,11 @@ class KMeans:
 
 
 class Route:
-    noOfEstab = 0
+
     searchTerm = 'pub'
     finalRoute = []
     final_route_id = []
     final_route_coords = []
-    prevResult = []
 
     warnings.filterwarnings('ignore')
 

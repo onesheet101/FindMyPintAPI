@@ -16,7 +16,7 @@ class PostHandler:
                 return jsonify({'message': 'Post uploaded success'}), 200
         except Exception as e:
             print(e)
-            return jsonify({'error': 'Post not saved'}), 500
+            return jsonify({'error': 'Post not saved'}), 400
 
     def is_post_owner(self, user_id, post_id):
         query = "SELECT * FROM new_post WHERE user_id = %s AND post_id = %s"
@@ -46,10 +46,10 @@ class PostHandler:
             with self.db.cursor():
                 self.db.execute(query, (postID))
                 self.db.commit()
-            return jsonify({'message': 'Post deleted successfully'})
+            return jsonify({'message': 'Post deleted successfully'}), 200
         except Exception as e:
             print(e)
-            return jsonify({'message': 'Post not deleted'}), 500
+            return jsonify({'message': 'Post not deleted'}), 400
 
     classNo = 7
     searchTerm = 'pub'  # general search term for establishments
@@ -173,7 +173,7 @@ class PostHandler:
             return rslt
         except Exception as e:
             print(e)
-            return jsonify({'message': 'Error unable to retrieve liked posts'})
+            return jsonify({'message': 'Error unable to retrieve liked posts'}), 400
 
     def getPostLocation(self, postID):
 
