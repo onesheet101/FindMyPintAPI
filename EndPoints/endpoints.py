@@ -153,7 +153,7 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth):
         # Return as JSON
             return jsonify({"message": account_details})
         except:
-            return jsonify("error":"Account details could not be retrieved")
+            return jsonify({"error":"Account details could not be retrieved"})
     
     @app.route('/update-establishments', methods  = ['POST'])
     @jwt_required()

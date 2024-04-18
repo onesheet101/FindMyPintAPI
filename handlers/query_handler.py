@@ -38,6 +38,7 @@ class QueryHandler:
                     if len(results) == 1:
                         return results[0]
                     else:
+                        self.db.commit()
                         return results
                 else:
                     return True  # Query executed successfully
