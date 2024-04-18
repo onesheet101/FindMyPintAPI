@@ -179,10 +179,9 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh,
         # produces x number of establishment names for the route planner
 
         try:
-
-            data = request.get_json()
-            start_point = data.get('start_point')
-            distance = data.get('distance')
+            start_point = (request.args.get('lat'), request.args.get('lon')) 
+            distance = (request.args.get('num'))
+            
             routeh.createRoute(start_point, 7, distance)
             full_route = routeh.getFinalRoute()
 
@@ -212,7 +211,7 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh,
         coords = (request.args.get('lat'), request.args.get('lon')) 
         places = gmapsh.getEstabs(coords)
 
-        return jsonify({'data': places})
+        return jsonify({'data': places}), 200
 
     @app.route('/get-estab-details', methods=['GET'])
     @jwt_required()
