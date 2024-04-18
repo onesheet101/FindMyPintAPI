@@ -122,9 +122,19 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth):
         else:
             return jsonify({'error': 'User does not own that post'}), 403
 
-
-
-
+    @app.route('/get-friend-feed')
+    @jwt_required()
+    def get_friend_feed():
+        try:
+            user_id = get_jwt_identity()
+            query  = "SELECT following_user_id FROM following WHERE userid = %s"
+            friend_list = queryh.run_query(query,(user_id,), True)
+            for friend_id in friend_list:
+                query = "SELECT post_body WHERE user_id = %s"
+                queryh.run_query(query, (friend_id,),True)
+                
+    except:
+        return jsonify({"error":"posts could not be retrieved"}),400
 #-----------------------Account Handling----------------------------------------------------------------------
     @app.route('/get-account', methods = ['GET'])
     @jwt_required()
