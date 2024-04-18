@@ -57,13 +57,13 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh,
 
         # Checks if any fields are empty again.
         if not username or not password or not email:
-            return jsonify({"error": "Missing a parameter"}), 1
+            return jsonify({"error": "Missing a parameter"}), 401
 
         if not passwordh.check_user_pass_validity(password):
-            return jsonify({"error": "Password format incorrect"}), 2
+            return jsonify({"error": "Password format incorrect"}), 402
 
         if not passwordh.check_user_pass_validity(username):
-            return jsonify({"error": "Username format incorrect"}), 3
+            return jsonify({"error": "Username format incorrect"}), 403
 
         # check and see if username exists in database need to set up interface!!!
         # If user exists return error code and message.
@@ -72,7 +72,7 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh,
 
         email_password = os.getenv('SECRET_EMAIL_KEY')
         if not send_confirmation(email, context, config, email_password):
-            return jsonify({"error": "Email could not be sent, registration failed"}), 4
+            return jsonify({"error": "Email could not be sent, registration failed"}), 406
 
         hashed_password = passwordh.hash_string(password)
         hashed_email = passwordh.hash_string(email)
@@ -81,7 +81,7 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh,
         if passwordh.store_password(username, hashed_password, hashed_email):
             return jsonify({"message": "User registered successfully"}), 201
         else:
-            return jsonify({"error": "Problem adding database record"}), 5
+            return jsonify({"error": "Problem adding database record"}), 405
 
 #-----------------------Post Handling----------------------------------------------------------------------
     @app.route('/upload_post', methods=['POST'])
