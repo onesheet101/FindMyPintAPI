@@ -117,9 +117,66 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh,
             return jsonify({'data': 'Post deleted'}), 200
         else:
             return jsonify({'error': 'User does not own that post'}), 403
+    
+    
 
+
+    
 # -----------------------------------Generate Posts Handling--------------------------------------------
+    @app.route('/get_feed',methods = ['GET'])
+    @jwt_required()
+    def get_feed():
+        ##Get posts 
+        query = "SELECT post_body,user_id FROM post"
 
+        posts =queryh.get_posts(query,None,True) ##Gets 10 results 
+        post_list= []
+
+        for post in posts:
+            #Get Username 
+            query = "SELECT username FROM user_sensitive WHERE user = %s"
+            userid = post[1]
+            username  = queryh.run_query(query, (userid,),True)
+            text = post[0]
+            post_dict  = {'username': username, 
+                            'text': text}
+            post_list.append(post_dict)
+        return jsonify(post_list)
+
+    @app.route('/get-friend-feed',methods = ['GET'])
+    @jwt_required()
+    def get_friend_feed():
+        try:
+            user_id = get_jwt_identity()
+            query = "SELECT following_user_id FROM following WHERE user_id = ?"
+            friend_list = queryh.run_query(query, (user_id,), True)
+
+            friend_feed = []
+
+            for friend_id in friend_list:
+                query = "SELECT post_body, post_time FROM post WHERE user_id = %s ORDER BY post_time DESC LIMIT 10"
+                friend_posts = queryh.run_query(query, (friend_id,), True)
+                
+                for post in friend_posts:
+                    post_body = post[0]
+                    post_time = post[1]
+
+                    # Get Username 
+                    query = "SELECT username FROM user_sensitive WHERE user_id = %s"
+                    username = queryh.run_query(query, (friend_id,), True)[0]
+
+                    post_dict = {'username': username, 'text': post_body, 'time': post_time}
+                    friend_feed.append(post_dict)
+
+            # Sort the friend feed by time
+            sorted_friend_feed = sorted(friend_feed, key=lambda x: x['time'], reverse=True)
+
+            return jsonify(sorted_friend_feed[:10])  # Return the first 10 posts in the sorted feed
+        except Exception as e:
+            return jsonify({"error": str(e)}), 400
+
+    
+    
     @app.route('/generate-recommended-posts', methods=['GET'])
     @jwt_required()
     def generateForYouPosts():
@@ -150,6 +207,58 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh,
         return jsonify({'data': loaded_posts}), 200
 
 #----------------------------Route handling----------------------------------------------
+    @app.route('/get-community-route',methods= ['GET'])
+    @jwt_required()
+    def get_community_routes():
+        #Select all routs in saved routes db and return name and routeid
+        query = "SELECT ID, Name FROM saved_routes"
+        routes_list = queryh.run_query(query)
+        return jsonify(routes_list)
+
+    
+    @app.route('/get-saved-route',methods = ['GET'])
+    @jwt_required() 
+    def get_route():
+        routeid = request.get_json("route_id")
+        query = "SELECT est_list FROM saved_routes WHERE route_id =%s"
+        route_list = []
+        est_list = queryh.run_query(query,routeid,True)
+        for id in est_list:
+            query = "SELECT est_id, name, lat, lon FROM establishment WHERE est_id = %s"
+            est_info = queryh.run_query(query,id,True)
+            location_dict = {
+            'est_id': est_info[0],
+            'est_name': est_info[1],
+            'lat': est_info[2],
+            'lon': est_info[3]
+            }
+            route_list.append(location_dict)
+        
+        return jsonify(location_dict)
+
+        @app.route('/get-reviews', methods = ['GET'])
+    @jwt_required()
+    def get_establishment_reviews():
+        est_id = request.get_json("est_id")
+        query = "SELECT user_id, stars FROM reviews WHERE est_id = %s"
+        try:
+            results=  queryh.run_query(query, est_id,True)
+            return jsonify(results)
+        except:
+            return jsonify({"error":"reviews could not be retrieved"}), 400
+
+    @app.route('/save-review',methods =['POST'])
+    @jwt_required()
+    def saveReview(self, userID, stars, public, text):
+        user_id = get_jwt_identity()
+        stars = request.get_json('stars')
+        query = "INSERT INTO reviews (review_id,user_id, stars) VALUES (%s,%s, %s)"
+        try:
+            queryh.run_query(query, (user_id, stars))
+            return jsonify({'message': 'Review saved successfully'}), 200
+        except Exception as e:
+            #print(e)
+            return jsonify({'error': 'Review not saved'}), 400
 
     @app.route('/get-recommended-establishments', methods=['GET'])
     @jwt_required()
@@ -226,7 +335,36 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh,
         except Exception as e:
             return jsonify({'error': 'Unable to get details'}), 400
 #------------------------------------Accounts---------------------------------------------------
+    @app.route('/get-account', methods = ['GET'])
+    @jwt_required()
+    def get_account_details(): 
+        try:
+            user_id = get_jwt_identity()
 
+            # Get username
+            username_query = "SELECT username FROM user_sensitive WHERE user_id = %s"
+            username = queryh.run_query(username_query, user_id, True)[0]
+
+            # Get establishments
+            est_list_query = "SELECT est_1, est_2, est_3 FROM user_preferences WHERE user_id = %s"
+            establishments = queryh.run_query(est_list_query, user_id, True)
+
+            # Get drinks
+            drink_list_query = "SELECT drink_1, drink_2, drink_3 FROM user_preferences WHERE user_id = %s"
+            drinks = queryh.run_query(drink_list_query, user_id, True)
+
+            # Construct dictionary
+            account_details = {
+                'username': username,
+                'establishments': establishments,
+                'drinks': drinks
+            }
+        # Return as JSON
+            return jsonify({"message": account_details})
+        except:
+            return jsonify({"error":"Account details could not be retrieved"}),400
+
+    
     @app.route('/update-establishment', methods=['POST'])
     @jwt_required()
     def update_establishment():
@@ -258,3 +396,19 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh,
             return jsonify({"message": "data successfully updated"}), 200
         else:
             return jsonify({"error": "Database not updated"}), 400
+    @app.route('/get-account-establishments', methods = ['GET'])
+    @jwt_required()
+    def get_account_establishments():
+        user_id = get_jwt_identity()
+        query = "SELECT est_1, est_2, est_3 FROM user_preferences WHERE user_id =%s"
+        estbalishmnent_list = queryh.run_query(query, user_id, True)
+        return jsonify({'data': estbalishmnent_list})
+    
+    @app.route('/get-drinks', methods = ['GET'])
+    @jwt_required()
+    def get_drinks():
+        user_id = get_jwt_identity()
+        query = "SELECT drink_1, drink_2, drink_3 FROM user_preferences WHERE user_id =%s"
+        estbalishmnent_list = queryh.run_query(query, user_id, True)
+        return jsonify({'data': estbalishmnent_list}) 
+    
