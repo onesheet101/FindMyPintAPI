@@ -147,6 +147,7 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh,
 #----------------------------Route handling----------------------------------------------
 
     @app.route('/get-recommended-establishments', methods=['GET'])
+    @jwt_required()
     def getRecommendedestablishments():
         # takes input coordinates and then produces establishments with the same classification around it
 
@@ -167,7 +168,8 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh,
             return jsonify({'message': 'Unable to produce recommended establishments'}), 400
 
 
-    @app.route('/get-route', methods=['GET'])
+    @app.route('/create-route', methods=['GET'])
+    @jwt_required()
     def getRouteLocations():
         # produces x number of establishment names for the route planner
 
@@ -198,6 +200,7 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh,
         return jsonify({'message': 'Error: Unable to save route'}), 400
 
     @app.route('/get-estabs-around-point', methods=['GET'])
+    @jwt_required()
     def get_estabs():
 
         data = request.get_json()
