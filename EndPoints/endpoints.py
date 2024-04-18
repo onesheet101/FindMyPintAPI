@@ -79,7 +79,7 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth):
         hashed_password = passwordh.hash_string(password)
         hashed_email = passwordh.hash_string(email)
 
-        # store hashed_password with the username in the database again need to work on implementing database functionality.
+        # store hashed_password with the username in the database again
         if passwordh.store_password(username, hashed_password, hashed_email):
             try:
                 query = "INSERT INTO new_user_preference (user_id, est1, est2, est3, drink1,drink2,drink3) VALUES (%s, %s, %s, %s,%s, %s, %s)"
@@ -96,13 +96,14 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth):
 #-----------------------Post Handling----------------------------------------------------------------------
     @app.route('/upload-post', methods=['POST'])
     @jwt_required()
+    # upload post using either latitude or longitude
     def upload_post():
         user_id = get_jwt_identity()
         data = request.get_json()
         body = data.get('body')
         longitude = data.get('longitude')
         latitude = data.get('latitude')
-        if not latitude or not longitude:
+        if not latitude or not longitude:  #error handling for lat/lon
             return jsonify({'error': 'Either latitude or longitude was not supplied.'}), 400
         if not body:
             return jsonify({'error': 'The post body was empty'}), 400
@@ -110,6 +111,7 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth):
 
     @app.route('/delete-post', methods=['POST'])
     @jwt_required()
+    #post deletion, checks if post exists before deleting
     def delete_post():
         user_id = get_jwt_identity()
         data = request.get_json()
