@@ -4,7 +4,7 @@ from flask_jwt_extended import jwt_required, create_access_token, get_jwt_identi
 import os
 
 
-def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth):
+def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh, kmeansh, routeh, generateh):
 
     #-------------------------------------------------------------------------------------------------------------------
     # ----------------------------------------------PASSWORD HANDLING---------------------------------------------------

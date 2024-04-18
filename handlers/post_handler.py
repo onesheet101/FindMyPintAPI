@@ -8,7 +8,7 @@ class PostHandler:
         self.gm = gm
 
     def upload_post(self, user_id, body):
-        query = "INSERT INTO new_post (user_id, body) VALUES (%s, %s)"
+        query = "INSERT INTO post (user_id, body) VALUES (%s, %s)"
         try:
             with self.db.cursor() as cursor:
                 self.db.execute(query, (user_id, body))
@@ -19,7 +19,7 @@ class PostHandler:
             return jsonify({'error': 'Post not saved'}), 400
 
     def is_post_owner(self, user_id, post_id):
-        query = "SELECT * FROM new_post WHERE user_id = %s AND post_id = %s"
+        query = "SELECT * FROM post WHERE user_id = %s AND post_id = %s"
 
         with self.db.cursor() as cursor:
             cursor.execute(query, (user_id, post_id))
@@ -30,7 +30,7 @@ class PostHandler:
                 return False
 
     def does_post_exist(self, post_id):
-        query = "SELECT * FROM new_post WHERE post_id = %s"
+        query = "SELECT * FROM post WHERE post_id = %s"
 
         with self.db.cursor() as cursor:
             cursor.execute(query, (post_id))
@@ -41,7 +41,7 @@ class PostHandler:
                 return False
 
     def deletePost(self, postID):
-        query = "DELETE FROM new_post WHERE Post_id = %s"
+        query = "DELETE FROM post WHERE Post_id = %s"
         try:
             with self.db.cursor():
                 self.db.execute(query, (postID))

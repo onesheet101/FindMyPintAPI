@@ -57,7 +57,7 @@ gm = googlemaps.Client(key=os.getenv('SECRET_GET_API_KEY'))
 #Create Handler Instances
 passwordh = PasswordHandler(db)
 queryh = QueryHandler(db)
-posth = PostHandler(db)
+posth = PostHandler(db, gm)
 generateh = Generate(db)
 gmapsh = GoogleMapsAPI(gm)
 kmeansh = KMeans(gm)
