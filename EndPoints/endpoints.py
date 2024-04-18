@@ -148,23 +148,35 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth):
     @app.route('/get-friend-feed',methods = ['GET'])
     @jwt_required()
     def get_friend_feed():
-        ##Get friend list
-        ##For each friend get posts 
-        #
         try:
             user_id = get_jwt_identity()
-            query  = "SELECT following_user_id FROM following WHERE userid = %s"
-            friend_list = queryh.run_query(query,(user_id,), True)
+            query = "SELECT following_user_id FROM following WHERE user_id = ?"
+            friend_list = queryh.run_query(query, (user_id,), True)
+
+            friend_feed = []
+
             for friend_id in friend_list:
-                #Get Post text
-                query = "SELECT post_body FROM following WHERE user_id = %s"
-                text = queryh.run_query(query, (friend_id,),True)
-                #Get Username 
-                query = "SELECT username FROM user_sensitive WHERE userid = %s"
-                queryh.run_query(query, ())
-        except:
-            return jsonify({"error":"posts could not be retrieved"}),400
-        
+                query = "SELECT post_body, post_time FROM post WHERE user_id = %s ORDER BY post_time DESC LIMIT 10"
+                friend_posts = queryh.run_query(query, (friend_id,), True)
+                
+                for post in friend_posts:
+                    post_body = post[0]
+                    post_time = post[1]
+
+                    # Get Username 
+                    query = "SELECT username FROM user_sensitive WHERE user_id = %s"
+                    username = queryh.run_query(query, (friend_id,), True)[0]
+
+                    post_dict = {'username': username, 'text': post_body, 'time': post_time}
+                    friend_feed.append(post_dict)
+
+            # Sort the friend feed by time
+            sorted_friend_feed = sorted(friend_feed, key=lambda x: x['time'], reverse=True)
+
+            return jsonify(sorted_friend_feed[:10])  # Return the first 10 posts in the sorted feed
+        except Exception as e:
+            return jsonify({"error": str(e)}), 400
+       
 #-----------------------Account Handling----------------------------------------------------------------------
     @app.route('/get-account', methods = ['GET'])
     @jwt_required()
