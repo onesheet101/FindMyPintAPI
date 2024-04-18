@@ -113,9 +113,9 @@ class GoogleMapsAPI:
             placeIDs.append(i['place_id'])  # add to placeIDs
 
         ou = []
-        ou.append(placeNames)
-        ou.append(placeIDs)
-        ou.append(crds)
+
+        for i in range(len(placeNames)):
+            ou.append({'place_names': placeNames[i], 'place_ids': placeIDs[i], 'lat': (crds[i])[0], 'lon': (crds[i])[1]})
 
         return ou
 
@@ -388,6 +388,7 @@ class Route:
                 rte.append(str(i) + ',')
 
             query = 'UPDATE SavedRoutes SET VALUES(COUNT(RouteID) + 1, %s, %s, %s, %s)'
+            query = 'INSERT INTO new_saved_routes VALUES()'
             self.db.execute(query, 0, len(route), route, 0, user_id)
             self.db.commit()
 

@@ -144,7 +144,7 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh,
         # takes input coordinates and then produces establishments with the same classification around it
 
         try:
-            start_point = request.args.get('Start Point')
+            start_point = request.args.get('start_point')
             #re = Recommended.GoogleMapsAPI(startPoint, searchTerm)
             attr = gmapsh.produceAttributes()
             attr = kmeansh.formDataset(attr)
@@ -189,6 +189,15 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh,
         if routeh.saveRoute(route, user_id):
             return jsonify({'message': 'Route saved successfully'}), 200
         return jsonify({'message': 'Error: Unable to save route'}), 400
+
+    @app.route('/get-estabs-around-point', methods=['GET'])
+    def get_estabs():
+
+        data = request.get_json()
+        coords = data.get('coordinates')
+        places = gmapsh.getEstabs(coords)
+
+        return jsonify({'data': places})
 
 
 
