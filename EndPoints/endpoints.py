@@ -218,11 +218,11 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh,
     @jwt_required()
     def get_estab_details():
 
-        coords = (request.args.get('lat'), request.args.get('lon')) 
-        details = gmapsh.get_establishment_details(coords)
-
-        return jsonify({'data': details})
-
+        try:
+            coords = (request.args.get('lat'), request.args.get('lon'))
+            details = gmapsh.get_establishment_details(coords)
+            return jsonify({'data': details}), 200
+        except Erro
 #------------------------------------Accounts---------------------------------------------------
 
     @app.route('/update-establishment', methods=['POST'])
