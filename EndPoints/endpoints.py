@@ -236,7 +236,7 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh,
         
         return jsonify(location_dict)
 
-        @app.route('/get-reviews', methods = ['GET'])
+    @app.route('/get-reviews', methods = ['GET'])
     @jwt_required()
     def get_establishment_reviews():
         est_id = request.get_json("est_id")
