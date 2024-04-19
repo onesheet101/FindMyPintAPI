@@ -116,11 +116,7 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh,
             return jsonify({'data': 'Post deleted'}), 200
         else:
             return jsonify({'error': 'User does not own that post'}), 401
-    
-    
 
-
-    
 # -----------------------------------Generate Posts Handling--------------------------------------------
     @app.route('/get_feed',methods = ['GET'])
     @jwt_required()
@@ -174,8 +170,6 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh,
         except Exception as e:
             return jsonify({"error": str(e)}), 400
 
-    
-    
     @app.route('/generate-recommended-posts', methods=['GET'])
     @jwt_required()
     def generate_for_you_posts():
@@ -210,7 +204,6 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh,
         query = "SELECT ID, Name FROM saved_routes"
         routes_list = queryh.run_query(query)
         return jsonify(routes_list), 200
-
     
     @app.route('/get-saved-route',methods = ['GET'])
     @jwt_required() 
@@ -277,7 +270,6 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh,
             print(e)
             return jsonify({'message': 'Unable to produce recommended establishments'}), 400
 
-
     @app.route('/create-route', methods=['GET'])
     @jwt_required()
     def get_route_locations():
@@ -325,6 +317,7 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh,
             return jsonify({'data': details}), 200
         except Exception as e:
             return jsonify({'error': 'Unable to get details'}), 400
+
 #------------------------------------Accounts---------------------------------------------------
     @app.route('/get-account', methods = ['GET'])
     @jwt_required()
