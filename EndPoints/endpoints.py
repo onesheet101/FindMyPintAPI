@@ -47,7 +47,7 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh,
             passwordh.update_password(username, hashed_password)
             return jsonify({'message': 'Password change successful'}), 200
 
-        return jsonify({'error': 'Invalid username or password'}), 401
+        return jsonify({'error': 'Invalid username or password'}), 400
 
     @app.route('/register', methods=['POST'])
     def register():
@@ -60,22 +60,22 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh,
 
         # Checks if any fields are empty again.
         if not username or not password or not email:
-            return jsonify({"error": "Missing a parameter"}), 403
+            return jsonify({"error": "Missing a parameter"}), 400
 
         if not passwordh.check_user_pass_validity(password):
-            return jsonify({"error": "Password format incorrect"}), 404
+            return jsonify({"error": "Password format incorrect"}), 400
 
         if not passwordh.check_user_pass_validity(username):
-            return jsonify({"error": "Username format incorrect"}), 405
+            return jsonify({"error": "Username format incorrect"}), 400
 
-        # check and see if username exists in database need to set up interface!!!
+        #See if username is available.
         # If user exists return error code and message.
         if passwordh.does_user_exist(username, user_table):
-            return jsonify({"error": "User already exists"}), 409
+            return jsonify({"error": "User already exists"}), 400
 
         email_password = os.getenv('SECRET_EMAIL_KEY')
         if not send_confirmation(email, context, config, email_password):
-            return jsonify({"error": "Email could not be sent, registration failed"}), 402
+            return jsonify({"error": "Email could not be sent, registration failed"}), 400
 
         hashed_password = passwordh.hash_string(password)
         hashed_email = passwordh.hash_string(email)
@@ -86,9 +86,9 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh,
             query = "INSERT INTO user_preference (user_id, est_1, est_2, est_3, drink_1, drink_2, drink_3) VALUES (%s, %s, %s, %s, %s, %s, %s)"
             data = (user_id, "N/A", "N/A", "N/A", "Corona", "Corona", "Corona")
             queryh.run_query(query, data, False)
-            return jsonify({"message": "User registered successfully"}), 201
+            return jsonify({"message": "User registered successfully"}), 200
         else:
-            return jsonify({"error": "Problem adding database record"}), 410
+            return jsonify({"error": "Problem adding database record"}), 400
 
     #-----------------------Post Handling----------------------------------------------------------------------
     @app.route('/upload-post', methods=['POST'])
@@ -112,12 +112,12 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh,
         data = request.get_json()
         post_id = data.get('post_id')
         if not posth.does_post_exist(post_id):
-            return jsonify({'error': 'Post does not exist for given post_id'}), 404
+            return jsonify({'error': 'Post does not exist for given post_id'}), 400
         if posth.is_post_owner:
             posth.delete_post(post_id)
             return jsonify({'data': 'Post deleted'}), 200
         else:
-            return jsonify({'error': 'User does not own that post'}), 403
+            return jsonify({'error': 'User does not own that post'}), 400
     
     
 
@@ -142,7 +142,7 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh,
             post_dict  = {'username': username, 
                             'text': text}
             post_list.append(post_dict)
-        return jsonify(post_list)
+        return jsonify(post_list), 200
 
     @app.route('/get-friend-feed',methods = ['GET'])
     @jwt_required()
@@ -235,7 +235,7 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh,
             }
             route_list.append(location_dict)
         
-        return jsonify(location_dict)
+        return jsonify(location_dict), 200
 
     @app.route('/get-reviews', methods = ['GET'])
     @jwt_required()
@@ -244,7 +244,7 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh,
         query = "SELECT user_id, stars FROM reviews WHERE est_id = %s"
         try:
             results=  queryh.run_query(query, est_id,True)
-            return jsonify(results)
+            return jsonify(results), 200
         except:
             return jsonify({"error":"reviews could not be retrieved"}), 400
 
@@ -298,7 +298,6 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh,
             full_route = routeh.getFinalRoute()
 
             return jsonify({'data': full_route}), 200
-            #return jsonify({'message': 'ok'}), 200
         except Exception as e:
             print(e, file=sys.stderr)
             return jsonify({'message': 'Unable to create route'}), 400
@@ -361,15 +360,14 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh,
                 'drinks': drinks
             }
         # Return as JSON
-            return jsonify({"message": account_details})
+            return jsonify({"message": account_details}), 200
         except:
             return jsonify({"error":"Account details could not be retrieved"}),400
 
-    
+    #Updates a ranking in user top 3 ranked pubs.
     @app.route('/update-establishment', methods=['POST'])
     @jwt_required()
     def update_establishment():
-        #Find what estbalishments needs updating
         data = request.get_json()
         number  = data.get_json("number")
         new_name  = data.get_json("est_name")
@@ -382,10 +380,10 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh,
         else:
             return jsonify({"error": "Database not updated"}), 400
 
+    # Updates a drink in top 3 ranked drinks.
     @app.route('/update-drinks', methods=['POST'])
     @jwt_required()
-    def update_drink():  # test
-        ##Find what drink needs updating
+    def update_drink():
         data = request.get_json()
         number = data.get_json("number")
         new_name = data.get_json("drink_name")
@@ -397,19 +395,22 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh,
             return jsonify({"message": "data successfully updated"}), 200
         else:
             return jsonify({"error": "Database not updated"}), 400
+
+    #Gives the user's top three pubs.
     @app.route('/get-account-establishments', methods = ['GET'])
     @jwt_required()
     def get_account_establishments():
         user_id = get_jwt_identity()
         query = "SELECT est_1, est_2, est_3 FROM user_preferences WHERE user_id =%s"
-        estbalishmnent_list = queryh.run_query(query, user_id, True)
-        return jsonify({'data': estbalishmnent_list})
-    
+        establishmnent_list = queryh.run_query(query, user_id, True)
+        return jsonify({'data': establishmnent_list}), 200
+
+    # Gives the user's top three drinks.
     @app.route('/get-drinks', methods = ['GET'])
     @jwt_required()
     def get_drinks():
         user_id = get_jwt_identity()
         query = "SELECT drink_1, drink_2, drink_3 FROM user_preferences WHERE user_id =%s"
-        estbalishmnent_list = queryh.run_query(query, user_id, True)
-        return jsonify({'data': estbalishmnent_list}) 
+        establishmnent_list = queryh.run_query(query, user_id, True)
+        return jsonify({'data': establishmnent_list}), 200
     

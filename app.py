@@ -14,12 +14,12 @@ from handlers.route_handler import GoogleMapsAPI, KMeans, Route
 from dotenv import load_dotenv
 import googlemaps
 
-#Make sure to change this before pushing!
+#Uncomment line below when hosting locally.
 #load_dotenv('Hidden/.env')
 #Initialises the flask app library.
 app = Flask(__name__)
-load_dotenv()
 
+#Gets a database connection as an object.
 try:
 
     db = mysql.connector.connect(
@@ -68,6 +68,6 @@ setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh, kme
 
 if __name__ == '__main__':
     #Starts flask
-    app.run(debug=True)
+    app.run(debug=False)
 
 #test

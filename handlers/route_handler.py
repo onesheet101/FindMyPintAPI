@@ -27,9 +27,6 @@ class GoogleMapsAPI:
         self.gm = gm
 
     def getSingleAttribute(self, coord):
-
-        # gm = gmaps.Client(key=self.api_key)
-
         offset = 1  # how much of potential location matches the searchTerm
         biasRadius = 0  # radius of closeness bias from long/lat of device
         lang = 'None'  # set default language - English
@@ -50,9 +47,6 @@ class GoogleMapsAPI:
         return [add['result']]
 
     def getKeyAttributes(self, currCoords, searchTerm):
-
-        # gm = gmaps.Client(key=self.api_key) # set up client with API key
-
         # searchTerm -> key term to search for places
         offset = 1  # how much of potential location matches the searchTerm
         startLocation = currCoords  # set longitude and latitude
@@ -84,7 +78,6 @@ class GoogleMapsAPI:
 
     def getEstabs(self, coords):
 
-        # gm = gmaps.Client(self.api_key) # set up client with API key
 
         placeNames = []
         placeIDs = []
@@ -172,7 +165,6 @@ class GoogleMapsAPI:
 
     def contains(self, data, inp):
         # data should be list
-
         found = False
         for i in data:
             if i == inp:
@@ -181,7 +173,6 @@ class GoogleMapsAPI:
 
     def getData(self, data):
         # data should be a list of attributes 1 or 0 of all the same length
-
         count = len(data[0])
         attr = ''
         out = []
@@ -229,14 +220,12 @@ class GoogleMapsAPI:
 
     def getDistanceTo(self, sp, ep):
         # Gets the distance between sp and ep
-        # gmaps = gmaps.Client(key=self.api_key)
         result = self.gm.distance_matrix(sp, ep)
         distanceInM = result['rows'][0]['elements'][0]['distance']['text']
         return distanceInM
 
     def getTimeTo(self, sp, ep):
         # get the time it takes to go from sp to ep
-        # gmaps = gmaps.Client(key=self.api_key)
         result = self.gm.distance_matrix(sp, ep)
         time_taken = result['rows'][0]['elements'][0]['duration']['text']
         return time_taken
@@ -344,9 +333,9 @@ class Route:
         self.gm = gm
         self.db = db
 
-    list_of_dict = []
-    def createRoute(self, sp, classNo, no_of_estab):
 
+    def createRoute(self, sp, classNo, no_of_estab):
+        list_of_dict = []
         correctPlaces = []
         correct_coords = []
         correct_place_id = []
@@ -377,12 +366,12 @@ class Route:
             self.final_route_id = correct_place_id[:no_of_estab]
             self.final_route_coords = correct_coords[:no_of_estab]
             #Move selected place names, route ids and coords into list of dictionary format
-            self.list_of_dict.append(
+            list_of_dict.append(
                 {'est_name': self.finalRoute[0], 'est_id': self.final_route_id[0], 'lat': sp[1],
                  'lon': sp[0]})
 
             for i in range(1, len(self.finalRoute)):
-                self.list_of_dict.append({'est_name': self.finalRoute[i], 'est_id': self.final_route_id[i], 'lat': self.final_route_coords[i][0], 'lon': self.final_route_coords[i][1]})
+                list_of_dict.append({'est_name': self.finalRoute[i], 'est_id': self.final_route_id[i], 'lat': self.final_route_coords[i][0], 'lon': self.final_route_coords[i][1]})
             return True  # need to only return number of estab amount
         else:
             if classNo >= 3:
@@ -403,7 +392,6 @@ class Route:
         return self.list_of_dict
 
     def saveRoute(self, route, user_id):
-
         try:
             rte = []
             gme = GoogleMapsAPI(self.gm)

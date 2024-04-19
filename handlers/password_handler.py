@@ -49,10 +49,12 @@ class PasswordHandler():
             self.db.commit()
         return
 
-    def hash_string(self, password):
-        hashed_string = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+    #Hashes given string using bcrypt
+    def hash_string(self, to_hash):
+        hashed_string = bcrypt.hashpw(to_hash.encode('utf-8'), bcrypt.gensalt())
         return hashed_string
 
+    #Simple error checks on valid passwords to store.
     def check_user_pass_validity(self, password):
         passlength = len(password)
         if passlength <= 7 or passlength > 16:

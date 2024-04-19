@@ -1,7 +1,7 @@
 from email.message import EmailMessage
 import smtplib
-import sys
 
+#As the function name suggests, this just sends a confirmation email to the given address.
 def send_confirmation(email_receiver, context, config, email_password):
     email_sender = config.get('EMAIL', 'SENDER')
     email_subject = config.get('EMAIL', 'SUBJECT')

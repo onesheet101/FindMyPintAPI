@@ -122,7 +122,7 @@ class PostHandler:
         data = gm.produceAttributes(coords)  # get attributes of establishment with given coordinates
         pID = gm.getPlaceIDs()  # get the placeIDs
         cData = km.formDataset(data)  # create the dataset for data in the correct format
-        classes = km.buildModel(cData, self.classNo)  # classify each of the
+        classes = km.buildModel(cData, self.classNo)
 
         placeClasses = {}
 
