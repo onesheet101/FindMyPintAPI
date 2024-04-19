@@ -7,7 +7,6 @@ import os
 
 
 def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh, kmeansh, routeh, generateh):
-
     #-------------------------------------------------------------------------------------------------------------------
     # ----------------------------------------------PASSWORD HANDLING---------------------------------------------------
     @app.route('/login', methods=['POST'])
@@ -32,7 +31,6 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh,
 
     @app.route('/change-password', methods=['POST'])
     def change_password():
-
         data = request.json
         username = data.get('username')
         password = data.get('password')
@@ -181,7 +179,6 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh,
     @app.route('/generate-recommended-posts', methods=['GET'])
     @jwt_required()
     def generate_for_you_posts():
-
         user_id = get_jwt_identity()
         fy_posts = posth.getRecommendedPosts(user_id)
         loaded_posts = generateh.load_posts(fy_posts)
@@ -191,7 +188,6 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh,
     @app.route('/generate-all-posts', methods=['GET'])
     @jwt_required()
     def generate_all_posts():
-
         all_posts = posth.getAllPosts()
         loaded_posts = generateh.load_posts(all_posts)
 
@@ -200,7 +196,6 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh,
     @app.route('/generate-friends-posts', methods=['GET'])
     @jwt_required()
     def generate_friends_posts():
-
         user_id = get_jwt_identity()
         friends_posts = posth.getFriendsPosts(user_id)
         loaded_posts = generateh.load_posts(friends_posts)
@@ -287,7 +282,6 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh,
     @jwt_required()
     def get_route_locations():
         # produces x number of establishment names for the route planner
-
         try:
             start_point = (request.args.get('lat'), request.args.get('lon')) 
             distance = request.args.get('num')
@@ -306,7 +300,6 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh,
     @jwt_required()
     def save_route():
         # Take a list of establishments, convert them to a comma seperated string then save to database
-
         user_id = get_jwt_identity()
         route = request.get_json()
 
@@ -318,7 +311,6 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh,
     @jwt_required()
     def get_estabs():
         #get list of establishments around a set of coordinates.
-
         coords = (request.args.get('lat'), request.args.get('lon')) 
         places = gmapsh.getEstabs(coords)
 
@@ -327,7 +319,6 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh,
     @app.route('/get-estab-details', methods=['GET'])
     @jwt_required()
     def get_estab_details():
-
         try:
             coords = (request.args.get('lat'), request.args.get('lon'))
             details = gmapsh.get_establishment_details(coords)
