@@ -1,5 +1,6 @@
 import bcrypt
 
+
 class PasswordHandler():
 
     def __init__(self, db):

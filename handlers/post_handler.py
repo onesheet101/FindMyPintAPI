@@ -1,6 +1,7 @@
 from flask import jsonify
 from handlers.route_handler import GoogleMapsAPI, KMeans
 
+
 class PostHandler:
 
     def __init__(self, db, gm):

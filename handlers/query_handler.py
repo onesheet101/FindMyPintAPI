@@ -1,4 +1,6 @@
 import sys
+
+
 class QueryHandler:
 
     def __init__(self, db):
