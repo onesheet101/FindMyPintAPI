@@ -47,7 +47,7 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh,
             passwordh.update_password(username, hashed_password)
             return jsonify({'message': 'Password change successful'}), 200
 
-        return jsonify({'error': 'Invalid username or password'}), 400
+        return jsonify({'error': 'Invalid username or password'}), 401
 
     @app.route('/register', methods=['POST'])
     def register():
@@ -63,19 +63,19 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh,
             return jsonify({"error": "Missing a parameter"}), 400
 
         if not passwordh.check_user_pass_validity(password):
-            return jsonify({"error": "Password format incorrect"}), 400
+            return jsonify({"error": "Password format incorrect"}), 422
 
         if not passwordh.check_user_pass_validity(username):
-            return jsonify({"error": "Username format incorrect"}), 400
+            return jsonify({"error": "Username format incorrect"}), 422
 
         #See if username is available.
         # If user exists return error code and message.
         if passwordh.does_user_exist(username, user_table):
-            return jsonify({"error": "User already exists"}), 400
+            return jsonify({"error": "User already exists"}), 409
 
         email_password = os.getenv('SECRET_EMAIL_KEY')
         if not send_confirmation(email, context, config, email_password):
-            return jsonify({"error": "Email could not be sent, registration failed"}), 400
+            return jsonify({"error": "Email could not be sent, registration failed"}), 500
 
         hashed_password = passwordh.hash_string(password)
         hashed_email = passwordh.hash_string(email)
@@ -88,7 +88,7 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh,
             queryh.run_query(query, data, False)
             return jsonify({"message": "User registered successfully"}), 200
         else:
-            return jsonify({"error": "Problem adding database record"}), 400
+            return jsonify({"error": "Problem adding database record"}), 500
 
     #-----------------------Post Handling----------------------------------------------------------------------
     @app.route('/upload-post', methods=['POST'])
@@ -112,12 +112,12 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh,
         data = request.get_json()
         post_id = data.get('post_id')
         if not posth.does_post_exist(post_id):
-            return jsonify({'error': 'Post does not exist for given post_id'}), 400
+            return jsonify({'error': 'Post does not exist for given post_id'}), 404
         if posth.is_post_owner:
             posth.delete_post(post_id)
             return jsonify({'data': 'Post deleted'}), 200
         else:
-            return jsonify({'error': 'User does not own that post'}), 400
+            return jsonify({'error': 'User does not own that post'}), 401
     
     
 
@@ -172,7 +172,7 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh,
             # Sort the friend feed by time
             sorted_friend_feed = sorted(friend_feed, key=lambda x: x['time'], reverse=True)
 
-            return jsonify(sorted_friend_feed[:10])  # Return the first 10 posts in the sorted feed
+            return jsonify(sorted_friend_feed[:10]), 200  # Return the first 10 posts in the sorted feed
         except Exception as e:
             return jsonify({"error": str(e)}), 400
 
@@ -180,17 +180,17 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh,
     
     @app.route('/generate-recommended-posts', methods=['GET'])
     @jwt_required()
-    def generateForYouPosts():
+    def generate_for_you_posts():
 
         user_id = get_jwt_identity()
         fy_posts = posth.getRecommendedPosts(user_id)
         loaded_posts = generateh.load_posts(fy_posts)
 
-        return jsonify({'data': loaded_posts})
+        return jsonify({'data': loaded_posts}), 200
 
     @app.route('/generate-all-posts', methods=['GET'])
     @jwt_required()
-    def generateAllPosts():
+    def generate_all_posts():
 
         all_posts = posth.getAllPosts()
         loaded_posts = generateh.load_posts(all_posts)
@@ -199,7 +199,7 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh,
 
     @app.route('/generate-friends-posts', methods=['GET'])
     @jwt_required()
-    def generateFriendsPosts():
+    def generate_friends_posts():
 
         user_id = get_jwt_identity()
         friends_posts = posth.getFriendsPosts(user_id)
@@ -214,7 +214,7 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh,
         #Select all routs in saved routes db and return name and routeid
         query = "SELECT ID, Name FROM saved_routes"
         routes_list = queryh.run_query(query)
-        return jsonify(routes_list)
+        return jsonify(routes_list), 200
 
     
     @app.route('/get-saved-route',methods = ['GET'])
@@ -250,7 +250,7 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh,
 
     @app.route('/save-review',methods =['POST'])
     @jwt_required()
-    def saveReview(self, userID, stars, public, text):
+    def save_review(self, userID, stars, public, text):
         user_id = get_jwt_identity()
         stars = request.get_json('stars')
         query = "INSERT INTO reviews (review_id,user_id, stars) VALUES (%s,%s, %s)"
@@ -263,7 +263,7 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh,
 
     @app.route('/get-recommended-establishments', methods=['GET'])
     @jwt_required()
-    def getRecommendedestablishments():
+    def get_recommended_establishments():
         # takes input coordinates and then produces establishments with the same classification around it
 
         try:
@@ -285,7 +285,7 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh,
 
     @app.route('/create-route', methods=['GET'])
     @jwt_required()
-    def getRouteLocations():
+    def get_route_locations():
         # produces x number of establishment names for the route planner
 
         try:
@@ -304,7 +304,7 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh,
 
     @app.route('/save-route', methods=['POST'])
     @jwt_required()
-    def saveRoute():
+    def save_route():
         # Take a list of establishments, convert them to a comma seperated string then save to database
 
         user_id = get_jwt_identity()
@@ -362,7 +362,7 @@ def setup_endpoints(app, jwt, context, config, passwordh, queryh, posth, gmapsh,
         # Return as JSON
             return jsonify({"message": account_details}), 200
         except:
-            return jsonify({"error":"Account details could not be retrieved"}),400
+            return jsonify({"error":"Account details could not be retrieved"}), 400
 
     #Updates a ranking in user top 3 ranked pubs.
     @app.route('/update-establishment', methods=['POST'])
